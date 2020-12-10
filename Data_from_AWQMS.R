@@ -12,3 +12,7 @@ tax <- sqlFetch(bio.sql,"dbo.Taxon_DEQ") ##  DEQ Taxon table with AWQMS uid
 
 d_t <- data %>% 
        left_join(tax, by = c('tax_uid' = 'AWQMS_tax_uid')) 
+
+
+
+#This is my addition
