@@ -8,7 +8,36 @@ library(data.table)
 ### connect to BioMon SQL database ### 
 bio.sql <- odbcConnect("BioMon") ### This requires an ODBC connection to the BioMon Database - directions here \\deqlab1\BioMon\Databases\ODBC_32_BioMon.docx
 bugs <- sqlFetch(bio.sql,"dbo.VW_Raw_Macro") # this is a view with all the macro data 
+
+
+  # limit columns to what is necessary
+   act_id
+   MLocID
+   SampleStart_Date
+   Sample_Method
+   Activity_Type
+   Result_Numeric
+   DEQ_Taxon
+   StageID
+   UniqueTaxon
+
+   
+??????' Whats up with all of the station level stuff in this bugs table?  e.g.: HUC, Elev, Precip, etc.????'   
+   
+      
+
+
 taxonomy <- sqlFetch(bio.sql,"dbo.Taxon_DEQ") ##  DEQ Taxon table with AWQMS uid 
+
+   #limit columns to what is necessary
+    DEQ_TAXON
+    Taxon
+    OTU_RIV05_Nov05
+    OTU_Stress05
+    FFG
+    Voltine
+    MTI
+    
 
 
 # join bugs and taxonomy tables
@@ -31,24 +60,27 @@ sta.sql = odbcConnect('Stations')
 stations = sqlFetch(sta.sql, "VWStationsFinal") 
 odbcClose(sta.sql)
 
-#limit columns to those needed for these analyses
 
-stations$ELEV_m <- stations$ELEV_Ft*0.3048 #get elevation in meters
-library(data.table)
-setnames(stations, old=c('station_key', 'Lat_DD', 'Long_DD', 'Predator_WorE', 'EcoRegion2', 'EcoRegion3'), 
-         new=c('STATION_KEY', 'lat', 'long', 'W_E', 'Eco2', 'Eco3'))
 
-library(dplyr)
-
-stations<-stations %>%
-  select(STATION_KEY, MLocID, StationDes, lat, long, Eco2, Eco3, EcoRegion4, ELEV_m, precip_mm, temp_Cx10, 
-         W_E, HUC6_Name, HUC8_Name, HUC10_Name, HUC12_Name, Wade_Boat, COMID)
-
-library(plyr)
-revalue(stations$Eco2, c("MARINE WEST COAST FOREST" = "MWCF", "WESTERN CORDILLERA" = "WC")) -> stations$Eco2  # change factor levels to match code below for names to Level 2 Ecoregions
-
-summary(stations$Eco2)
-colnames(stations)                
-
-#####################
-
+@@@@@@ need to wait on this piece until know for sure what data and columns we are dealing with
+                                #limit columns to those needed for these analyses
+                                
+                                stations$ELEV_m <- stations$ELEV_Ft*0.3048 #get elevation in meters
+                                library(data.table)
+                                setnames(stations, old=c('station_key', 'Lat_DD', 'Long_DD', 'Predator_WorE', 'EcoRegion2', 'EcoRegion3'), 
+                                         new=c('STATION_KEY', 'lat', 'long', 'W_E', 'Eco2', 'Eco3'))
+                                
+                                library(dplyr)
+                                
+                                stations<-stations %>%
+                                  select(STATION_KEY, MLocID, StationDes, lat, long, Eco2, Eco3, EcoRegion4, ELEV_m, precip_mm, temp_Cx10, 
+                                         W_E, HUC6_Name, HUC8_Name, HUC10_Name, HUC12_Name, Wade_Boat, COMID)
+                                
+                                library(plyr)
+                                revalue(stations$Eco2, c("MARINE WEST COAST FOREST" = "MWCF", "WESTERN CORDILLERA" = "WC")) -> stations$Eco2  # change factor levels to match code below for names to Level 2 Ecoregions
+                                
+                                summary(stations$Eco2)
+                                colnames(stations)                
+                                
+                                #####################
+                                
