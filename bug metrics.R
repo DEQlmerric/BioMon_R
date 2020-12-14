@@ -1,10 +1,20 @@
 #
-#
-#
+# Author: Shannon Hubler, Bug Overlord
+# Original Code = Bio Tools R upgrade_v3.4_noBCG.R
+
+# Adapted to a stand-alone set of code, just for calculating bug metrics
+# This code would typically follow running "Data_from_AWQMS.R"
+
+# 12.14.2020
+
+
+# optimally, this would be turned into a function, to roll through all samples at once
 
 
 
+sfsgw
 
+ d b
 
 
 
