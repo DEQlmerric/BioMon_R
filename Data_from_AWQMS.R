@@ -96,5 +96,12 @@ revalue(stations$Eco2, c("MARINE WEST COAST FOREST" = "MWCF", "WESTERN CORDILLER
 
 b_t_s <- b_t %>%
   left_join(stations, by = c('MLocID'))
- 
+  
 
+
+
+@
+@@@
+@@@@@@@@@@@@@@@@@@@@@@@   what do we need from sample info??????????
+@@@
+@
