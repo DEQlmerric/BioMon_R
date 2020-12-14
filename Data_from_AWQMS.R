@@ -1,4 +1,20 @@
-# Start of the biomon AWQMS data pull 
+# Authors: Lesley Merrick, Shannon Hubler
+
+# 12.14.2020
+
+# pull bug count data from AWQMS (using a view from Biomon SQL dbase)
+# pull Taxonomy table (from Biomon SQL dbase)
+# pull Stations table (from Station SQL dbase)
+# Format data for analyses
+      #limit fields to only those necessary, 
+      #rename as needed to match existing models
+
+
+
+
+
+
+Start of the biomon AWQMS data pull 
 
 library(tidyverse)
 library(RODBC) 
