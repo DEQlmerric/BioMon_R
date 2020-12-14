@@ -87,7 +87,7 @@ setnames(MTI, old=c('x'), new=c('MTI'))
 ###
 
 
-b_t_s$Unique.num<-ifelse(b_t_s$UniqueTaxon=='Yes', 1,0)
+b_t_s$Unique.num<-ifelse(b_t_s$UniqueTaxon=='UniqueTaxon', 1,0)
 total.richness<-aggregate(b_t_s$Unique.num,  list(Sample=b_t_s$Sample), sum)  
 colnames(total.richness)[colnames(total.richness)=="x"] <- "total.richness"
 
@@ -100,7 +100,7 @@ colnames(total.richness)[colnames(total.richness)=="x"] <- "total.richness"
 
 # richness of all Orders --separatetly
 order.rich<-count(b_t_s, vars=c('Sample','UniqueTaxon', 'Order'))
-order.rich<- subset(order.rich, UniqueTaxon=='Yes')
+order.rich<- subset(order.rich, UniqueTaxon=='UniqueTaxon')
 order.rich<-cast(order.rich, Sample ~ Order)
 colnames(order.rich) <- paste(colnames(order.rich), "rich",  sep = ".") #add '.rich' to note the type of metric
 order.rich[is.na(order.rich)] <- 0
@@ -113,7 +113,7 @@ order5.rich<-subset(order.rich, select=c(Sample, Coleoptera.rich, Diptera.rich, 
 
 # richness of all Families --separately  
 family.rich<-count(b_t_s, vars=c('Sample','UniqueTaxon', 'Family'))
-family.rich<- subset(family.rich, UniqueTaxon=='Yes')
+family.rich<- subset(family.rich, UniqueTaxon=='UniqueTaxon')
 family.rich<-cast(family.rich, Sample ~ Family)
 colnames(family.rich) <- paste(colnames(family.rich), "rich",  sep = ".") #add '.rich' to note the type of metric
 family.rich[is.na(family.rich)]<- 0
