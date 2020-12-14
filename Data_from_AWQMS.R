@@ -48,7 +48,7 @@ b_t <- bugs %>%
 
 ##############################
 ## bring in Stations table
-
+ 
 
 
 #connect to view as a general user 
