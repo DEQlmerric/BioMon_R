@@ -9,12 +9,12 @@
       #limit fields to only those necessary, 
       #rename as needed to match existing models
 
+ 
 
 
 
 
 
-Start of the biomon AWQMS data pull 
 
 library(tidyverse)
 library(RODBC) 
@@ -51,7 +51,7 @@ taxonomy <- sqlFetch(bio.sql,"dbo.Taxon_DEQ") ##  DEQ Taxon table with AWQMS uid
 
 #limit columns to what is necessary
 taxonomy <- taxonomy %>%
-  select(DEQ_TAXON, Taxon, OTU_RIV05_Nov05, OTU_Stress05, FFG, Voltine, MTI)
+  select(DEQ_TAXON, Taxon, OTU_RIV05_Nov05, OTU_Stress05, FFG, Voltine, MTI, Order, Family, Class)
     
 
 

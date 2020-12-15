@@ -10,8 +10,8 @@
 
 # optimally, this would be turned into a function, to roll through all samples at once
 
-
-
+library(reshape)
+library(plyr)
 
 
 
@@ -91,13 +91,13 @@ b_t_s$Unique.num<-ifelse(b_t_s$UniqueTaxon=='UniqueTaxon', 1,0)
 total.richness<-aggregate(b_t_s$Unique.num,  list(Sample=b_t_s$Sample), sum)  
 colnames(total.richness)[colnames(total.richness)=="x"] <- "total.richness"
 
-
+ 
 ###
 ####
 ##  ## Order_Family
 ####
 ###
-
+ 
 # richness of all Orders --separatetly
 order.rich<-count(b_t_s, vars=c('Sample','UniqueTaxon', 'Order'))
 order.rich<- subset(order.rich, UniqueTaxon=='UniqueTaxon')
@@ -146,7 +146,7 @@ pct_order5<-subset(pct_Order, select=c(Sample, pct_Coleoptera, pct_Diptera, pct_
 # richness
 
 EPT.richness<-count(b_t_s, vars=c('Sample','UniqueTaxon', 'Order'))
-EPT.richness<- subset(EPT.richness, UniqueTaxon=='Yes')
+EPT.richness<- subset(EPT.richness, UniqueTaxon=='UniqueTaxon')
 EPT.richness<-subset(EPT.richness,  Order=='Ephemeroptera' | Order=='Plecoptera' |Order=='Trichoptera')
 EPT.richness<-aggregate(EPT.richness$freq,  list(Sample=EPT.richness$Sample), sum)  
 colnames(EPT.richness)[colnames(EPT.richness)=="x"] <- "EPT.rich"
@@ -169,7 +169,7 @@ pct_EPT<-ddply(.data=pct_Order, .(Sample), summarize,
 # richness
 
 voltine.rich<-count(b_t_s, vars=c('Sample','UniqueTaxon', 'Voltine'))
-voltine.rich<- subset(voltine.rich, UniqueTaxon=='Yes')
+voltine.rich<- subset(voltine.rich, UniqueTaxon=='UniqueTaxon')
 voltine.rich<-cast(voltine.rich, Sample ~ Voltine) 
 voltine.rich[is.na(voltine.rich)]<- 0
 setnames(voltine.rich, old = c('MV', 'SV', 'UV'), new = c('multivoltine.rich','semivoltine.rich', 'univoltine.rich'))
@@ -184,7 +184,7 @@ a<-ddply(.data=b_t_s, .(Sample, Voltine), plyr::summarize, Count=sum(Count)) #su
 a<-merge(tot.abund, a, all.x=TRUE)
 pct_Voltine<-ddply(.data=a, .(Sample, Voltine), plyr::summarize, pct = Count/total.abundance*100)
 pct_Voltine<-cast(pct_Voltine, Sample ~ Voltine) 
-pct_Voltine<-pct_Voltine[,c(1:3,5)]
+pct_Voltine<-subset(pct_Voltine, select=c(Sample, MV, SV, UV)) # remove blanks or unknowns
 setnames(pct_Voltine, old = c('MV', 'SV', 'UV'), new = c('pct_multivoltine','pct_semivoltine', 'pct_univoltine'))
 
 
@@ -200,26 +200,25 @@ setnames(pct_Voltine, old = c('MV', 'SV', 'UV'), new = c('pct_multivoltine','pct
 
 # richness
 ffg.rich<-count(b_t_s, vars=c('Sample','UniqueTaxon', 'FFG'))
-ffg.rich<- subset(ffg.rich, UniqueTaxon=='Yes')
+ffg.rich<- subset(ffg.rich, UniqueTaxon=='UniqueTaxon')
 ffg.rich<-cast(ffg.rich, Sample ~ FFG) 
 colnames(ffg.rich) <- paste(colnames(ffg.rich), "rich",  sep = ".")
 colnames(ffg.rich)[colnames(ffg.rich)=="Sample.rich"] <- "Sample"
+ffg.rich <- ffg.rich %>%
+  select(-V1.rich)
 
 
 # pct_FFG
 
 a<-ddply(.data=b_t_s, .(Sample, FFG), plyr::summarize, Count=sum(Count)) #sum counts, across the FFG categories separately
 a<-merge(tot.abund, a, all.x=TRUE)
-
 pct_FFG<-ddply(.data=a, .(Sample, FFG), plyr::summarize, pct = Count/total.abundance*100)
 pct_FFG<-cast(pct_FFG, Sample ~ FFG) 
-pct_FFG<-pct_FFG[,c(1:10)]
 colnames(pct_FFG) <- paste("pct", colnames(pct_FFG),   sep = "_")  # add prefix to denote metric type
 colnames(pct_FFG)[colnames(pct_FFG)=="pct_Sample"] <- "Sample"
 ffg.rich[is.na(ffg.rich)]<- 0
-
-
-
+pct_FFG<-pct_FFG %>%
+  select(-pct_V1)
 
 ##
 ###
@@ -262,12 +261,25 @@ pct_Dom<- merge(pct_Dom, pct_Dom.1)
 ###
 ##
 
+@@
+@@@@@  Need to double check SH.div -- not working for single sample on Lady Cr.
+@@
+
+
 SH.div<-ddply(.data=rel.abund.unique, .(Sample), plyr::summarize, Shannon_diversity= -(sum(rel.abund.unique*log(rel.abund.unique))))
 Simp.div<-ddply(.data=rel.abund.unique, .(Sample), plyr::summarize, Simpson_diversity= 1-sum(rel.abund.unique^2))
 summary(Simp.div)
 
 
 # Evenness
+
+
+@@
+  @@@@@  Need to double check SH.div -- not working for single sample on Lady Cr.
+@@
+  
+
+
 even<-merge(SH.div, total.richness)
 even<-ddply(.data=even, .(Sample), plyr::summarize, Evenness= Shannon_diversity/(log(total.richness)))
 summary(even)  
@@ -284,7 +296,7 @@ summary(even)
 
 # richness of all Non-Insects  
 noninsect.rich<-count(b_t_s, vars=c('Sample','UniqueTaxon', 'Class'))
-noninsect.rich<- subset(noninsect.rich, UniqueTaxon=='Yes' & Class != 'Insecta')
+noninsect.rich<- subset(noninsect.rich, UniqueTaxon=='UniqueTaxon' & Class != 'Insecta')
 noninsect.rich<-ddply(.data=noninsect.rich, .(Sample), plyr::summarize, Non.Insect_richness=sum(freq))
 summary(noninsect.rich)
 
