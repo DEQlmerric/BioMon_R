@@ -9,7 +9,7 @@
       # 3) Run NBR null model
 
 
-
+library(devtools)
 
 #############################################################################
 #############################################################################
@@ -76,6 +76,22 @@ head(b.oe)
 # load the 'reshape2' package and source in the 'rarify' script for subsampling to 300
 
 source('//deqlab1/biomon/R Stats/Bio Tools_Upgrade with R/rarify_w_seed.r')
+
+@@@@
+  @@@@@
+  @@@@@
+    @@@@@@@@@@  Would be better to get off of the DEQ netork and source in directly form github.....???
+  @@@@
+  @@@@
+@@@@
+  
+source_url('https://github.com/DEQlmerric/BioMon_R.git/rarify_w_seed.R')
+
+
+@@@@@@  doesnt work.....?????????????????????
+
+
+
 #source('//deqlab1/biomon/R Stats/Bio Tools_Upgrade with R/rarify.r')
 
 # Input bug files from Access tables (Steps 1-3) are '3-column' format and NOT-SUBSAMPLED to 300 count 
@@ -160,9 +176,15 @@ table(bugs.NBR$Eco2, bugs.NBR$Eco3) # All samples must be from WIBR -- no Eco3 s
 #     1.7 create predictor files to match the bugs.model files
 ###
 
-
+@@@@@@
+  @@@@@@@@@
+  @@@@@@@@
+  @@@@@@@@@@@@@@@@@@@@ NEED TO FIX COLUMN INFO BELOW--based on old PHX structure....needs to match AWQMS
+  @@@@@@@@
+  @@@@@@@@
+@@@@@
 # get single records of Samples (SVN) and Stations (STATION_KEY)
-b.samps<-unique(b.s[,c('Sample', 'MLocID', 'STATION_KEY', 'Date', 'Habitat_sampled', 'Field_QA', 'Lab_QA', 'Increment_Field', 'Increment_Lab')])    # use unique records so that they can be matched with predictors from Station table
+b.samps<-unique(b_t_s[,c('Sample', 'MLocID', 'STATION_KEY', 'Date', 'Habitat_sampled', 'Field_QA', 'Lab_QA', 'Increment_Field', 'Increment_Lab')])    # use unique records so that they can be matched with predictors from Station table
 
 
 b.samps.sta<-merge(b.samps, stations.ref, by="MLocID", all.x=TRUE, suffix=c("", ".y"))   
