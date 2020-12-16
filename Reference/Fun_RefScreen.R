@@ -74,4 +74,5 @@ ref_screen$ref.status_2020.yn <- as.factor(ref_screen$ref.status_2020.yn)
 with(ref_screen, table(ref.status_2020.yn, WorE)) # summary table of Ref status by E/W
 with(ref_screen, table(ref.status_2020.yn, EcoRegion3))
 
-.GlobalEnv$ref_screen <- ref_screen }
+.GlobalEnv$ref_screen <- ref_screen 
+write.csv(ref_screen, "Reference/ref_screen.csv")}
