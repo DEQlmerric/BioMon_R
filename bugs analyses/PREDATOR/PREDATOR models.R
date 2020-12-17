@@ -10,6 +10,7 @@
   
 
 library(devtools)
+library(dplyr)
 
 #############################################################################
 #############################################################################
@@ -42,7 +43,7 @@ b.oe<-aggregate(b_t_s$Count,  list(Sample=b_t_s$Sample, OTU=b_t_s$OTU_RIV05_Nov0
                                  Eco2=b_t_s$Eco2, Eco3=b_t_s$Eco3), sum )# For each OTU in a Sample, sum the Counts
 
 colnames(b.oe)
-b.oe<-rename(b.oe, c("x"="Count")) 
+b.oe<-rename(b.oe, c("Count"="x")) 
 head(b.oe)
 b.oe<-arrange(b.oe, Sample)               # sort the d.f by Sample
 b.oe<-subset(b.oe, OTU != 666)      # remove '666' from d.f (they are ambiguous taxa not used in models)
@@ -54,9 +55,9 @@ head(b.oe)
 #############
 #############
 
-@@@@@ IF new data is subsampled to 300 count 'AND' in MAtrix format, execute the following  (IGNORE subsampling below)
-# bug.test<-read.table("MWCF_bugs_mat.txt",row.names="sample",header=T,sep="\t");
-# dim(bug.test)
+                # IF new data is subsampled to 300 count 'AND' in MAtrix format, execute the following  (IGNORE subsampling below)
+                # bug.test<-read.table("MWCF_bugs_mat.txt",row.names="sample",header=T,sep="\t");
+                # dim(bug.test)
 
 #############          
 #############
@@ -75,25 +76,15 @@ head(b.oe)
 
 # load the 'reshape2' package and source in the 'rarify' script for subsampling to 300
 
-source('//deqlab1/biomon/R Stats/Bio Tools_Upgrade with R/rarify_w_seed.r')
+source('bugs analyses/PREDATOR/rarify_w_seed.R')
 
-@@@@
-  @@@@@
-  @@@@@
-    @@@@@@@@@@  Would be better to get off of the DEQ netork and source in directly form github.....???
-  @@@@
-  @@@@
-@@@@
+
+
+
+
   
-source_url('https://github.com/DEQlmerric/BioMon_R.git/rarify_w_seed.R')
-
-
-@@@@@@  doesnt work.....?????????????????????
-
-
-
-#source('//deqlab1/biomon/R Stats/Bio Tools_Upgrade with R/rarify.r')
-
+  
+  
 # Input bug files from Access tables (Steps 1-3) are '3-column' format and NOT-SUBSAMPLED to 300 count 
 # To subsample and turn into a site*taxa matrix, execute the following:
 
@@ -147,15 +138,31 @@ bugs.WCCP<-subset(bugs.all, Eco3== 4 | Eco3 ==10 | Eco3== 78 | Eco3== 9| Eco3== 
 dim(bugs.WCCP)
 summary(bugs.WCCP$Eco2)  # Mostly you will see 'WC', but LEVEL3 Eco 10 (Col. Plateau) is in L2 'WIBR'
 
-# confirm that in the WCCP file, all records with Eco2 = 'WIBR', are located in Eco3 = '10' (Columbia Plateau)
-check.wccp.wibr<-ifelse(bugs.WCCP$Eco2=='WC', 'OK', 
-                        ifelse(bugs.WCCP$Eco2 == 'COLD DESERTS'& bugs.WCCP$Eco3 == '10', 'WIBR.10', 'Doh!'))
-
-table(check.wccp.wibr) # if 'Doh!', there's a problem
 
 
-
-
+@@@@@
+  @@@@@@  Next section is a way to check the code.  Finalize the code, then comment this out so
+it doesnt show up in outputs when running through functions
+@@@@@
+  
+  
+            # confirm that in the WCCP file, all records with Eco2 = 'WIBR', are located in Eco3 = '10' (Columbia Plateau)
+            check.wccp.wibr<-ifelse(bugs.WCCP$Eco2=='WC', 'OK', 
+                                    ifelse(bugs.WCCP$Eco2 == 'COLD DESERTS'& bugs.WCCP$Eco3 == '10', 'WIBR.10', 'Doh!'))
+            
+            table(check.wccp.wibr) # if 'Doh!', there's a problem
+            
+            
+            @@@@
+              @@@@@
+            @@@@
+            
+  
+  
+  
+  
+  
+  
 #####
 #####
 #       1.6  Create data.frame for NBR Null Model 
@@ -222,22 +229,46 @@ colnames(b.samps.sta)
 preds.mwcf<-as.data.frame(subset(b.samps.sta, Eco2=='MWCF'))
 preds.wccp<-subset(b.samps.sta, Eco2=='WC' | Eco3==10)
 
-#check for duplicate Samples in each file
-which(duplicated(bugs.MWCF$Sample))
-which(duplicated(bugs.WCCP$Sample))
-which(duplicated(preds.mwcf$Sample))
-which(duplicated(preds.wccp$Sample))  
+                
 
-bugs.MWCF[duplicated(bugs.MWCF), ]
-bugs.WCCP[duplicated(bugs.WCCP), ]
-preds.mwcf[duplicated(preds.mwcf), ]
-preds.wccp[duplicated(preds.wccp), ]
 
+@@@@@
+  @@@@@@  Next section is a way to check the code.  Finalize the code, then comment this out so
+          it doesnt show up in outputs when running through functions
+@@@@@
+  
+  
+
+                #check for duplicate Samples in each file
+                which(duplicated(bugs.MWCF$Sample))
+                which(duplicated(bugs.WCCP$Sample))
+                which(duplicated(preds.mwcf$Sample))
+                which(duplicated(preds.wccp$Sample))  
+                
+                bugs.MWCF[duplicated(bugs.MWCF), ]
+                bugs.WCCP[duplicated(bugs.WCCP), ]
+                preds.mwcf[duplicated(preds.mwcf), ]
+                preds.wccp[duplicated(preds.wccp), ]
+                
 
 
 # total # of observations in predictors may not match bugs.....merge tables so only matched remain
-dim(bugs.MWCF); dim(preds.mwcf)
-dim(bugs.WCCP); dim(preds.wccp)
+
+                @@@@@
+                  @@@@@@  Next section is a way to check the code.  Finalize the code, then comment this out so
+                it doesnt show up in outputs when running through functions
+                @@@@@
+                  
+                  
+                
+                dim(bugs.MWCF); dim(preds.mwcf)
+                dim(bugs.WCCP); dim(preds.wccp)
+                
+
+@@@@@@@@@@@@@
+
+
+
 mwcf.b.p<-merge(bugs.MWCF, preds.mwcf, by=c('Sample', 'STATION_KEY', 'Eco2', 'Eco3'), suffix=c("", ".y")) 
 
 wccp.b.p<-merge(bugs.WCCP, preds.wccp, by=c('Sample', 'STATION_KEY', 'Eco2', 'Eco3'), suffix=c("", ".y")) 
@@ -259,11 +290,24 @@ preds.wccp.F<-as.data.frame(wccp.b.p[,c(1,297:307)])
 
 
 #verify dimensions are same for each input file
-dim(bugs.MWCF.F); dim(preds.mwcf.F) 
-dim(bugs.WCCP.F); dim(preds.wccp.F)
+
+
+@@@@@
+  @@@@@@  Next section is a way to check the code.  Finalize the code, then comment this out so
+it doesnt show up in outputs when running through functions
+@@@@@
+  
+  
+
+
+
+              
+              dim(bugs.MWCF.F); dim(preds.mwcf.F) 
+              dim(bugs.WCCP.F); dim(preds.wccp.F)
 
 
 # need this to get Sample as row.names for 'model.predict.v4.1'.  If don't then O/E not assigned to Sample IDs.
+
 row.names(bugs.MWCF.F)<-bugs.MWCF.F$Sample  
 row.names(preds.mwcf.F)<-preds.mwcf.F$Sample
 row.names(bugs.WCCP.F)<-bugs.WCCP.F$Sample
@@ -272,13 +316,22 @@ row.names(preds.wccp.F)<-preds.wccp.F$Sample
 
 ##  Align bug and predictor data, by site/sample;
 
-row.names(bugs.MWCF.F)==row.names(preds.mwcf.F);#check sample(row) alignment of bug and predictor data;
-bugs.MWCF.F<-bugs.MWCF.F[row.names(preds.mwcf.F),];#samples are not aligned. Fix by aligning bugs data to predictor data, since latter is sorted by sample type;
-row.names(bugs.MWCF.F)==row.names(preds.mwcf.F);#check alignment again -- alignment OK;
+          @@@@@@ remove after verify code works properly?
+          row.names(bugs.MWCF.F)==row.names(preds.mwcf.F);#check sample(row) alignment of bug and predictor data;
 
-row.names(bugs.WCCP.F)==row.names(preds.wccp.F);#check sample(row) alignment of bug and predictor data;
+
+
+
+bugs.MWCF.F<-bugs.MWCF.F[row.names(preds.mwcf.F),];#samples are not aligned. Fix by aligning bugs data to predictor data, since latter is sorted by sample type;
+
+
+          @@@@@@ remove after verify code works properly?
+          
+          row.names(bugs.MWCF.F)==row.names(preds.mwcf.F);#check alignment again -- alignment OK;
+
+          row.names(bugs.WCCP.F)==row.names(preds.wccp.F);#check sample(row) alignment of bug and predictor data;
 bugs.WCCP.F<-bugs.WCCP.F[row.names(preds.wccp.F),];#samples are not aligned. Fix by aligning bugs data to predictor data, since latter is sorted by sample type;
-row.names(bugs.WCCP.F)==row.names(preds.wccp.F);#check alignment again -- alignment OK;
+          row.names(bugs.WCCP.F)==row.names(preds.wccp.F);#check alignment again -- alignment OK;
 
 
 
@@ -322,7 +375,7 @@ row.names(bugs.WCCP.F)==row.names(preds.wccp.F);#check alignment again -- alignm
 ##########;
 
 #source in prediction script and load models
-source("//deqlab1/biomon/R Stats/Bio Tools_Upgrade with R/model.predict.v4.1.r") # bring in model predict function (JVS script)
+source("bugs analyses/PREDATOR/model.predict.v4.1.r") # bring in model predict function (JVS script)
 
 # load and run each model separately
 
@@ -333,7 +386,7 @@ source("//deqlab1/biomon/R Stats/Bio Tools_Upgrade with R/model.predict.v4.1.r")
 
 ################
 
-load('//deqlab1/biomon/R Stats/Bio Tools_Upgrade with R/Nov05model_MWCF_16jan13.Rdata');    # bring in MWCF model
+load('bugs analyses/PREDATOR/Nov05model_MWCF_16jan13.Rdata');    # bring in MWCF model
 
 
 #Drop all samples/sites from bug and predictor data that do not not have complete data for the model predictors;
@@ -374,7 +427,7 @@ ddply(oe.mwcf, .(oe.cond), plyr::summarize, min = min(OoverE), max = max(OoverE)
 
 # assess all samples: 
 
-source('//deqlab1/biomon/R Stats/Bio Tools_Upgrade with R/assess.all.samples.v4.1_2.r')              
+source('bugs analyses/PREDATOR/assess.all.samples.v4.1_2.r')              
 
 assess.all_MWCF<- assess.all.samples.1.0(result.prd=OE.assess.test, bugnew=bugs.MWCF.F, Pc=0.5)
 
@@ -418,7 +471,7 @@ write.csv(assess.all_MWCF, 'assess.all_MWCF.csv')
 rm(bugcal.pa,grps.final,preds.final, grpmns,covpinv) 
 
 # bring in WCCP model
-load('//deqlab1/biomon/R Stats/Bio Tools_Upgrade with R/Nov05model_WCCP_16jan13.Rdata');    
+load('bugs analyses/PREDATOR/Nov05model_WCCP_16jan13.Rdata');    
 
 
 #Drop all samples/sites from bug and predictor data that do not not have complete data for the model predictors;
@@ -453,7 +506,7 @@ ddply(oe.wccp, .(oe.cond), summarize, min = min(OoverE), max = max(OoverE))
 
 # assess all samples: 
 
-source('//deqlab1/biomon/R Stats/Bio Tools_Upgrade with R/assess.all.samples.v4.1_2.r')              
+source('bugs analyses/PREDATOR/assess.all.samples.v4.1_2.r')              
 
 assess.all_WCCP<- assess.all.samples.1.0(result.prd=OE.assess.test, bugnew=bugs.WCCP.F, Pc=0.5)
 
