@@ -11,6 +11,8 @@
 
 library(devtools)
 library(dplyr)
+library(lubridate)
+library(data.table)
 
 #############################################################################
 #############################################################################
@@ -183,22 +185,18 @@ table(bugs.NBR$Eco2, bugs.NBR$Eco3) # All samples must be from WIBR -- no Eco3 s
 #     1.7 create predictor files to match the bugs.model files
 ###
 
-@@@@@@
-  @@@@@@@@@
-  @@@@@@@@
-  @@@@@@@@@@@@@@@@@@@@ NEED TO FIX COLUMN INFO BELOW--based on old PHX structure....needs to match AWQMS
-  @@@@@@@@
-  @@@@@@@@
-@@@@@
+
 # get single records of Samples (SVN) and Stations (STATION_KEY)
-b.samps<-unique(b_t_s[,c('Sample', 'MLocID', 'STATION_KEY', 'Date', 'Habitat_sampled', 'Field_QA', 'Lab_QA', 'Increment_Field', 'Increment_Lab')])    # use unique records so that they can be matched with predictors from Station table
+b.samps.sta<-unique(b_t_s[,c('Sample', 'MLocID', 'STATION_KEY', 'Date', 'Habitat', 'Activity_Type','long', 'lat',
+                         'temp_Cx10', 'precip_mm','Eco2', 'Eco3', 'ELEV_m', 'W_E')])   
+          # use unique records so that they can be matched with predictors from Station table
 
 
-b.samps.sta<-merge(b.samps, stations.ref, by="MLocID", all.x=TRUE, suffix=c("", ".y"))   
-#setnames(b.samps.sta, old = c('LAT_field.x', 'LONG_field.x'), new = c('LAT_field', 'LONG_field'))
-b.samps.sta<-b.samps.sta[c('Sample', 'STATION_KEY','MLocID', 'Date', 'long', 'lat','temp_Cx10', 'precip_mm', 
-                           'Eco2', 'Eco3', 'ELEV_m', 'W_E')]                       
-colnames(b.samps.sta)
+                              # b.samps.sta<-merge(b.samps, stations.ref, by="MLocID", all.x=TRUE, suffix=c("", ".y"))   
+                              # #setnames(b.samps.sta, old = c('LAT_field.x', 'LONG_field.x'), new = c('LAT_field', 'LONG_field'))
+                              # b.samps.sta<-b.samps.sta[c('Sample', 'STATION_KEY','MLocID', 'Date', 'long', 'lat','temp_Cx10', 'precip_mm', 
+                              #                            'Eco2', 'Eco3', 'ELEV_m', 'W_E')]                       
+                              #  colnames(b.samps.sta)
 
 
 
@@ -212,7 +210,7 @@ b.samps.sta$east<-as.numeric(ifelse(b.samps.sta$W_E =='w', 0,
                                     (ifelse(b.samps.sta$W_E =='e', 1,"" ))))   #change W_E to 0 or 1 (match PREDATOR input)
 
 setnames(b.samps.sta, old=c('precip_mm','temp_Cx10'), new=c('precip', 'temp'))
-colnames(b.samps.sta)
+
 
 # make sure you have the following predictors, at a minimum: 
 # daynum, 
