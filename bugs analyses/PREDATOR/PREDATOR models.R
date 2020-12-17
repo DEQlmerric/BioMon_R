@@ -237,17 +237,17 @@ preds.wccp<-subset(b.samps.sta, Eco2=='WC' | Eco3==10)
   
   
 
-                #check for duplicate Samples in each file
+                # #check for duplicate Samples in each file
                 which(duplicated(bugs.MWCF$Sample))
                 which(duplicated(bugs.WCCP$Sample))
                 which(duplicated(preds.mwcf$Sample))
-                which(duplicated(preds.wccp$Sample))  
-                
+                which(duplicated(preds.wccp$Sample))
+
                 bugs.MWCF[duplicated(bugs.MWCF), ]
                 bugs.WCCP[duplicated(bugs.WCCP), ]
                 preds.mwcf[duplicated(preds.mwcf), ]
                 preds.wccp[duplicated(preds.wccp), ]
-                
+
 
 
 # total # of observations in predictors may not match bugs.....merge tables so only matched remain
@@ -277,6 +277,9 @@ wccp.b.p<-merge(bugs.WCCP, preds.wccp, by=c('Sample', 'STATION_KEY', 'Eco2', 'Ec
   @@@@@@ would be best to use a list of taxa and call out other columns by name specifically @@@@@
   @@@@@@ but could be messy as new taxa are added into the OTU list...but I guess that requires changing column numbs too...
 @@@@
+  
+@@@@@@@  Is it possible to create a list of possible OTUs found in the Taxonomy table download?  
+@@@@@@@  That way it is pulling from the most up to date version.
   
   colnames(mwcf.b.p)
 bugs.MWCF.F<-as.data.frame(mwcf.b.p[,c(1:296)])
@@ -407,7 +410,7 @@ oe.mwcf<-OE.assess.test$OE.scores; #create a d.f out of OE.scores
 head(OE.assess.test$OE.scores)# look at O/E scores, for all samples;
 
 head(OE.assess.test$Group.Occurrence.Probs) # Look at the predicted group membership probabilities;
-head(OE.assess.test$Capture.Probs)  # Look at the predicted probabilties for each taxon at each site;
+head(OE.assess.test$Capture.Probs)  # Look at the predicted probabilities for each taxon at each site;
 
 # Assign PREDATOR condition classes == MWCF benchmarks
 oe.mwcf$OoverE<-round(oe.mwcf$OoverE, 2)
@@ -416,6 +419,11 @@ oe.mwcf$oe.cond<-(ifelse(oe.mwcf$OoverE <= 0.85, 'Most disturbed',
                                 ifelse(oe.mwcf$OoverE >= 0.92 & oe.mwcf$OoverE < 1.25, 'Least disturbed', 
                                        ifelse(oe.mwcf$OoverE >= 1.25, 'Enriched', -999)))))
 
+
+
+@@@@ 
+  @@@@@ Check.  Comment out when final. 
+@@@@
 # calculate min - max for each condition class
 ddply(oe.mwcf, .(oe.cond), plyr::summarize, min = min(OoverE), max = max(OoverE))
 # verify that results are consistent with PREDATOR documentation benchmarks: <=0.85, 0.86 - 0.91, 0.92 - 1.24, > 1.24
@@ -431,6 +439,11 @@ assess.all_MWCF<- assess.all.samples.1.0(result.prd=OE.assess.test, bugnew=bugs.
 
 
 # bring in BCG attributes for each taxon, merge with assess df
+
+@@@@
+@@@@@@@@@ Need to pull in from GitHub: https://github.com/leppott/BCGcalc.git
+@@@@
+  
 library(BCGcalc)
 bcg.taxa<-TaxaMaster_Ben_BCG_PacNW
 
@@ -477,19 +490,24 @@ load('bugs analyses/PREDATOR/Nov05model_WCCP_16jan13.Rdata');
 
 preds.wccp.F<-preds.wccp.F[complete.cases(preds.wccp.F[,preds.final]),]
 bugs.WCCP.F<-bugs.WCCP.F[row.names(preds.wccp.F),]
-dim(preds.wccp.F); dim(bugs.WCCP.F)   
-
+            
+@@@@@
+                  dim(preds.wccp.F); dim(bugs.WCCP.F)   
+@@@@@
 
 #make predictions for test data;
 OE.assess.test<-model.predict.v4.1(bugcal.pa,grps.final,preds.final, grpmns,covpinv,
                                    prednew=preds.wccp.F,bugnew=bugs.WCCP.F,Pc=0.5);
 
 oe.wccp<-OE.assess.test$OE.scores # create a d.f of OE.scores
-head(oe.wccp)# look at O/E scores, for all samples;
 
-head(OE.assess.test$Group.Occurrence.Probs)#Look at the predicted group membership probabilities;
-head(OE.assess.test$Capture.Probs)#Look at the predicted probabilties for each taxon at each site;
-
+@@@@@
+            head(oe.wccp)# look at O/E scores, for all samples;
+            
+            head(OE.assess.test$Group.Occurrence.Probs)#Look at the predicted group membership probabilities;
+            head(OE.assess.test$Capture.Probs)#Look at the predicted probabilties for each taxon at each site;
+@@@@@
+              
 # Assign PREDATOR condition classes == WCCP benchmarks
 oe.wccp$OoverE<-round(oe.wccp$OoverE, 2)
 oe.wccp$oe.cond<-(ifelse(oe.wccp$OoverE <= 0.78, 'Most disturbed', 
@@ -497,10 +515,11 @@ oe.wccp$oe.cond<-(ifelse(oe.wccp$OoverE <= 0.78, 'Most disturbed',
                                 ifelse(oe.wccp$OoverE >= 0.93 & oe.wccp$OoverE < 1.24, 'Least disturbed', 
                                        ifelse(oe.wccp$OoverE >= 1.24, 'Enriched', -999)))))
 
-# calculate min - max for each condition class
-ddply(oe.wccp, .(oe.cond), summarize, min = min(OoverE), max = max(OoverE))
-# verify that results are consistent with PREDATOR documentation benchmarks: <=0.78, 0.79 - 0.92, 0.93 - 1.23, > 1.23
-
+@@@@
+            # calculate min - max for each condition class
+            ddply(oe.wccp, .(oe.cond), summarize, min = min(OoverE), max = max(OoverE))
+            # verify that results are consistent with PREDATOR documentation benchmarks: <=0.78, 0.79 - 0.92, 0.93 - 1.23, > 1.23
+@@@@
 
 # assess all samples: 
 
