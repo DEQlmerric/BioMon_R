@@ -2,6 +2,7 @@
 #### Determine candidate reference sites from the GIS reference screening metrics###
 ref_screen.nonDEQ <- function(gis_mets){
 require(RODBC)
+library(tidyverse)
 
                               # ## pull in information from the stations db - this requires an ODBC connection 
                               # sta.sql = odbcConnect('Stations')
@@ -38,8 +39,10 @@ ref_screen <-  gis_mets %>%
                                   TRUE ~ 0))
 ref_screen <- ref_screen %>%
   mutate(ref.status_2020 = case_when(
-    rd_Status == 1 & xing_Status == 1 & Ag_Status == 1 & Urb21L_Status == 1 & mines_status == 1 & gmines_status == 1 ~ "Ref_GIS.candidate", # meets all 
-    rd_Status == 2 | xing_Status == 2 | Ag_Status == 2 | Urb21L_Status == 2 | mines_status == 2 | gmines_status == 2 ~ "Trash", 
+    rd_Status == 1 & xing_Status == 1 & Ag_Status == 1 & Urb21L_Status == 1 & mines_status == 1 & gmines_status == 1 &
+    canal_status == 1 ~ "Ref_GIS.candidate", # meets all 
+    rd_Status == 2 | xing_Status == 2 |  Ag_Status == 2 | Urb21L_Status == 2 | mines_status == 2 | gmines_status == 2 |
+      canal_status == 2 ~ "Trash", 
     TRUE ~ "Not"))
 
 ref_screen$ref.status_2020 <- as.factor(ref_screen$ref.status_2020)   
@@ -77,11 +80,6 @@ with(ref_screen, table(ref.status_2020.yn, WorE)) # summary table of Ref status 
 with(ref_screen, table(ref.status_2020.yn, EcoRegion3))
 
 .GlobalEnv$ref_screen <- ref_screen 
-write.csv(ref_screen, "Reference/ref_screen.csv")}
-
-@@@@@@@
-  @@@@@@@@@   NOT SURE WE WANT TO HAVE FILE WRITTEN FROM HERE?  aT LEAST NEED THE NAME TO BE VARIABLE SO IT 
-              DOESNT OVERWRITE EACH TIME
-@@@@@@@
+write.csv(ref_screen, "Reference/ref_screen_USU.csv")}
 
 
