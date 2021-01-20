@@ -8,19 +8,35 @@
 
 library(reshape2)
 require(tidyverse)
-
+library(readxl)
 # bring in data
-slh <- read.csv('//deqlab1/GIS_WA/Project_Working_Folders/Reference/2020/GE Screens/Screen results/2020 GE watershed screens_SLH.csv')
-slh$Agency_ID <- as.factor(slh$Agency_ID)
-mbs <- read.csv('//deqlab1/GIS_WA/Project_Working_Folders/Reference/2020/GE Screens/Screen results/GE_Ref_Screen_MBS.csv')
-mbs$Agency_ID <- as.factor(mbs$Agency_ID)
-alt <- read.csv('//deqlab1/GIS_WA/Project_Working_Folders/Reference/2020/GE Screens/Screen results/Reference_screen_bydate_ALT.csv')
-alt$Agency_ID <- as.factor(alt$Agency_ID)
+alt.usu <- read_excel('//deqlab1/GIS_WA/Project_Working_Folders/Reference/2020/GE Screens/USU_all/GE_USU Ref_Screen_ALT.xlsx',
+                      sheet='USU_ALT_2020')
+alt.usu_qc <- read_excel('//deqlab1/GIS_WA/Project_Working_Folders/Reference/2020/GE Screens/USU_all/GE_USU Ref_Screen_ALT.xlsx',
+                      sheet='USU_ALL_2020')
+
+
+
+mbs.usu <- read_excel('//deqlab1/GIS_WA/Project_Working_Folders/Reference/2020/GE Screens/USU_all/GE_USU_REF_Screen_MBS.xlsx',
+                      sheet='USU_MBS_2020')
+mbs.usu_qc <- read_excel('//deqlab1/GIS_WA/Project_Working_Folders/Reference/2020/GE Screens/USU_all/GE_USU_REF_Screen_MBS.xlsx',
+                         sheet='USU_ALL_2020')
+
+
+
+slh.usu <- read_excel('//deqlab1/GIS_WA/Project_Working_Folders/Reference/2020/GE Screens/USU_all/GE_USU_Ref_Screen_SLH.xlsx',
+                      sheet='USU_SLH_2020')
+slh.usu_qc <- read_excel('//deqlab1/GIS_WA/Project_Working_Folders/Reference/2020/GE Screens/USU_all/GE_USU_Ref_Screen_SLH.xlsx',
+                         sheet='USU_ALL_2020')
+
+
+
+
 
 # merge data frames together
 
-screens <- rbind(mbs, alt, slh)
-
+screens <- rbind(mbs.usu, mbs.usu_qc, alt.usu, alt.usu_qc, slh.usu, slh.usu_qc )
+colnames(screens)[colnames(screens)=="Sample date"] <- "Sample.date"
 
 # use reshape2 to make df go from wide to long (fewer columns)
 
@@ -42,11 +58,10 @@ screens_long <- melt(screens,
 )
 
 
-### List of QC sites (21855 and 33338 MAY be extras, can ignore)
-qc_sites <- c(13244, 17007, 17048, 21855, 21864, 21865, 21868, 21884, 23856, 24453, 26854, 26952, 30354, 30625, 31354, 31387, 33338, 35716, 35732, 35733, 35734, 35792)
+### List of QC sites 
 
-
-         
+qc_sites <- as.vector(screens$Agency_ID[screens$QC=='Y'])
+qc_sites <-unique(qc_sites)
 
 # long format does a good job, but not sure how to calculate across two rows
 # what if cast back to wide format, but only by putting Extent and Proximity as columns?
@@ -151,7 +166,7 @@ ggplot(qc, aes(x=Scorer, y=Disturb.score))+
   facet_wrap(~Scorer_BPJ)
 
 ggplot(qc, aes(y=Agency_ID, x=Disturb.score, colour = Scorer)) +
-  geom_point(position = position_jitter(width = 0.5, height = 0.0,), aes(shape=Scorer_BPJ, size = 2)) + xlim(0,20)+
+  geom_point(position = position_jitter(width = 0.5, height = 0.0,), aes(shape=Scorer_BPJ, size = 2)) + xlim(0,30)+
   theme(axis.text.x = element_text(angle = 0))
 
 
@@ -159,7 +174,7 @@ ggplot(qc, aes(y=Agency_ID, x=Disturb.score, colour = Scorer)) +
 
 # select individual sites for review
 
-qc.site <- screens_wide[screens_wide$Agency_ID=='26952',]
+qc.site <- screens_wide[screens_wide$Agency_ID=='XN-SS-4120',]
 view(qc.site)
 
 
@@ -170,10 +185,10 @@ bpj_y_above<-subset(GE_Site_sum.scores, Scorer_BPJ=="Y" & Disturb.score >= 15)
 
 bpj_n_below<-subset(GE_Site_sum.scores, Scorer_BPJ=="N" & Disturb.score < 15)
 
-bpj_question<-subset(GE_Site_sum.scores, Scorer_BPJ=="?" )
+bpj_question<-subset(GE_Site_sum.scores, Scorer_BPJ=="?"  | Scorer_BPJ == "N?")
 
-
-
+          bpj.checks.usu <-rbind(bpj_n_below, bpj_question)
+          write.csv(bpj.checks.usu, '//deqlab1/GIS_WA/Project_Working_Folders/Reference/2020/GE Screens/USU_all/bpj.checks.usu.csv')
 #########
 #
 #
@@ -212,7 +227,7 @@ GE_Site_sum.scores_ave <- GE_Site_sum.scores %>%
 
 
 # combine single disturb scores per station, with final BPJ status
-bpj.final <- read.csv('//deqlab1/GIS_WA/Project_Working_Folders/Reference/2020/GE Screens/Screen results/FINAL_BPJ_2021.csv')
+bpj.final <- read.csv('//deqlab1/GIS_WA/Project_Working_Folders/Reference/2020/GE Screens/USU_all/FINAL_BPJ_2021_USU.csv')
 
 bpj.final <- bpj.final%>%
   select(Agency_ID, BPJ_final)
@@ -238,14 +253,12 @@ colnames(GE_Site_sum.scores_ave_bpj)[which(names(GE_Site_sum.scores_ave_bpj) == 
 
 
 
-##############
-
-# join GE and station info together
-
-##############
-
+###########
 
 # bring in station level data                                    
+
+###########
+
 require(RODBC)
 
 #connect to view as a general user 
@@ -254,7 +267,7 @@ sta.sql = odbcConnect('Stations')
 stations = sqlFetch(sta.sql, "VWStationsFinal") 
 odbcClose(sta.sql)
 
-# cut down to essential columns
+
 stations <- stations %>%
   select(station_key, MLocID, StationDes, Lat_DD, Long_DD, EcoRegion3)
 
@@ -266,13 +279,21 @@ GE_Site_sum.scores_ave_bpj <- GE_Site_sum.scores_ave_bpj %>%
 
 
 # take the non-DEQ sites with 'NA' for MLocID and populate MLocID with station_key values
-GE_Site_sum.scores_ave_bpj$MLocID <- ifelse(is.na(GE_Site_sum.scores_ave_bpj$MLocID), 
-        GE_Site_sum.scores_ave_bpj$station_key, GE_Site_sum.scores_ave_bpj$MLocID)
+ 
+  #GE_Site_sum.scores_ave_bpj$MLocID <- as.factor(GE_Site_sum.scores_ave_bpj$MLocID)
+  #GE_Site_sum.scores_ave_bpj$station_key <- as.factor(GE_Site_sum.scores_ave_bpj$station_key)
+  
 
+#1 run this code
+        GE_Site_sum.scores_ave_bpj$MLocID <- ifelse(is.na(GE_Site_sum.scores_ave_bpj$MLocID), 
+            GE_Site_sum.scores_ave_bpj$station_key, GE_Site_sum.scores_ave_bpj$MLocID)
+
+
+   
 
 #drop stations columns and re-merge with stations to get complete dataset
 GE_Site_sum.scores_ave_bpj <- GE_Site_sum.scores_ave_bpj %>%
-  select(MLocID, station_key, Disturb.score, BPJ_final, Ref2020_FINAL)
+      select(MLocID, Disturb.score, BPJ_final, Ref2020_FINAL)
 
 
 stations <- subset(stations, select=-c(station_key))
@@ -281,29 +302,45 @@ GE_Site_sum.scores_ave_bpj <- GE_Site_sum.scores_ave_bpj %>%
   left_join(stations, by = 'MLocID')
 
 
+
+
+
+# still missing site level info, merge back with GIS data file
+gis.usu <- read_excel('//deqlab1/GIS_WA/Project_Working_Folders/Reference/2020/GE Screens/USU_all/USU_Ref_Screen.xlsx',
+                      sheet='ref_screen')
+
+gis.usu <- gis.usu %>%
+  select(MLocID, station, lat, long, location,  EcoRegion3)
+
+
+setnames(gis.usu, old=c('station', 'lat', 'long', 'location'), 
+         new=c('station_key', 'Lat_DD', 'Long_DD', 'StationDes'))
+
+GE_Site_sum.scores_ave_bpj <- GE_Site_sum.scores_ave_bpj %>%
+  select(MLocID, Disturb.score, BPJ_final, Ref2020_FINAL) # this drops out DEQ station info....
+
+GE_Site_sum.scores_ave_bpj <- GE_Site_sum.scores_ave_bpj %>%
+  left_join(gis.usu, by = c('MLocID'))
+
+
+# create a table of USU reference sites only, and export to final outputs folder
 ref2020.sites_FINAL <- GE_Site_sum.scores_ave_bpj[GE_Site_sum.scores_ave_bpj$Ref2020_FINAL=='YES',]
 
-
-
-write.csv(ref2020.sites_FINAL, '//deqlab1/GIS_WA/Project_Working_Folders/Reference/2020/_Final outputs/REF.sites.only_2020_FINAL_DEQ.csv')
+write.csv(ref2020.sites_FINAL, '//deqlab1/GIS_WA/Project_Working_Folders/Reference/2020/_Final outputs/REF.sites.only_2020_FINAL_usu.csv')
 
 
 # look at ref population
 
-with(GE_Site_sum.scores_ave_bpj, table(Ref2020_FINAL))
-with(GE_Site_sum.scores_ave_bpj, table(Ref2020_FINAL, EcoRegion3))
+with(ref2020.sites_FINAL, table(Ref2020_FINAL))
+with(ref2020.sites_FINAL, table(Ref2020_FINAL, EcoRegion3))
 
 
+ref2020.sites_by_eco <- with(ref2020.sites_FINAL, table(Ref2020_FINAL, EcoRegion3))
+write.csv(ref2020.sites_by_eco, '//deqlab1/GIS_WA/Project_Working_Folders/Reference/2020/_Final outputs/REF.2020_FINAL_by_ecoregion_USU.csv')
 
-# create an exportable table of ref sites by ecoregion, save in same location as 'ref2020.sites_FINAL'
 
-
-ref2020.sites_by_eco <- with(GE_Site_sum.scores_ave_bpj, table(Ref2020_FINAL, EcoRegion3))
-write.csv(ref2020.sites_by_eco, '//deqlab1/GIS_WA/Project_Working_Folders/Reference/2020/_Final outputs/REF.2020_FINAL_deq_by_ecoregion.csv')
 
 
 # export GE_Site_sum.scores_ave_bpj  --> this needs to be linked to GIS screen results (in "final ref tables.R')
-write.csv(GE_Site_sum.scores_ave_bpj, 'Reference/GE_Site_sum.scores_ave_bpj_DEQ.csv')
-
-
+write.csv(GE_Site_sum.scores_ave_bpj, 'Reference/GE_Site_sum.scores_ave_bpj_USU.csv')
 

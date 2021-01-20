@@ -38,14 +38,14 @@ ref_screen <-  gis_mets %>%
                                   P_canal > 2.551325 ~ 2,      # 95th - first non-zero
                                   TRUE ~ 0))
 ref_screen <- ref_screen %>%
-  mutate(ref.status_2020 = case_when(
+  mutate(GIS.status_2020 = case_when(
     rd_Status == 1 & xing_Status == 1 & Ag_Status == 1 & Urb21L_Status == 1 & mines_status == 1 & gmines_status == 1 &
     canal_status == 1 ~ "Ref_GIS.candidate", # meets all 
     rd_Status == 2 | xing_Status == 2 |  Ag_Status == 2 | Urb21L_Status == 2 | mines_status == 2 | gmines_status == 2 |
       canal_status == 2 ~ "Trash", 
-    TRUE ~ "Not"))
+    TRUE ~ "NO"))
 
-ref_screen$ref.status_2020 <- as.factor(ref_screen$ref.status_2020)   
+ref_screen$GIS.status_2020 <- as.factor(ref_screen$GIS.status_2020)   
 
 ref_screen <- ref_screen %>%
 mutate(WorE = case_when(
@@ -63,21 +63,21 @@ mutate(WorE = case_when(
     EcoRegion3 == "12" ~ "SRP"))
 ref_screen$WorE <- as.factor(ref_screen$WorE)    
 
-print(with(ref_screen, table(ref.status_2020, WorE))) # summary table of Ref status by E/W
-print(with(ref_screen, table(ref.status_2020, EcoRegion3)))
+print(with(ref_screen, table(GIS.status_2020, WorE))) # summary table of Ref status by E/W
+print(with(ref_screen, table(GIS.status_2020, EcoRegion3)))
 
 
 # create a column for ref "GIS candidate" status = binary (Y or N) using DEQ 2020 thresholds
 ref_screen <- ref_screen %>%
-  mutate(ref.status_2020.yn = case_when(
-    ref.status_2020 == "Ref_GIS.candidate" ~ "Y", # meets all 
+  mutate(GIS.status_2020.yn = case_when(
+    GIS.status_2020 == "Ref_GIS.candidate" ~ "Y", # meets all 
     TRUE ~ "N"))
 
-ref_screen$ref.status_2020.yn <- as.factor(ref_screen$ref.status_2020.yn)    
+ref_screen$GIS.status_2020.yn <- as.factor(ref_screen$GIS.status_2020.yn)    
 
 
-with(ref_screen, table(ref.status_2020.yn, WorE)) # summary table of Ref status by E/W
-with(ref_screen, table(ref.status_2020.yn, EcoRegion3))
+with(ref_screen, table(GIS.status_2020.yn, WorE)) # summary table of Ref status by E/W
+with(ref_screen, table(GIS.status_2020.yn, EcoRegion3))
 
 .GlobalEnv$ref_screen <- ref_screen 
 write.csv(ref_screen, "Reference/ref_screen_USU.csv")}
