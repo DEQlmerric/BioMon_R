@@ -9,7 +9,7 @@
 # But the GIS outputs for both sets of sites have different column names and dimensions (DEQ ~ 30, USU ~ 60)
 
 library(tidyverse)
-
+library(data.table)
 # bring in GIS outputs
 
 gis.deq <- read.csv('Reference/ref_screen.DEQ.csv')
@@ -126,3 +126,23 @@ one.table_rule.all <- rbind(d, u)
 
 write.csv(one.table_rule.all, 'Reference/one.table_rule.all.csv', row.names=FALSE)
 write.csv(one.table_rule.all, '//deqlab1/GIS_WA/Project_WOrking_Folders/Reference/2020/_Final outputs/one.table_rule.all.csv', row.names = FALSE)
+
+
+# create a data dictionary for one.table
+variables <- colnames(one.table_rule.all)
+
+definitions <- c('unique station identifier_DEQ stations table', 'station descriptive name', 'latitude_NAD83 decimal degrees', 'longitude_NAD83 decimal degrees',
+                 'Level3 Omernik Ecoregion_abbreviation', 'Common identifier of an NHD Flowline', 'road density per watershed area', 'xings per watershed area',
+                 '% Ag land use', '% of watershed assigned to Code21 landuse from NLCD', 'of mines in watershed', 'gravel mines per watershed area', '% of watershed with canals', 'Roads GIS status: 1 = Candidate ref 2 = Trashed 0 = Neither',
+                 'Road crossings GIS status', 'Ag GIS status', 'Code21 GIS status', 'Mines GIS status', 'Gravel Mines GIS status', 'Canals GIS status',
+                 'Overall GIS screen status--across all 7 GIS metrics', 'East or West of Cascades crest', 'Overall score from Google Earth Screens', 
+                 'Best professional judgement call from Reference Council', 'FINAL Reference status: combines GIS + GE + BPJ', 'Organization that provided the station'
+                )
+
+
+one.table_meta.data<-as.data.frame(cbind(variables, definitions))
+write.csv(one.table_meta.data, 'Reference/one.table_meta.data.csv')
+write.csv(one.table_meta.data, '//deqlab1/GIS_WA/Project_WOrking_Folders/Reference/2020/_Final outputs/one.table_meta.data.csv')
+
+
+
