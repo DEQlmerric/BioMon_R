@@ -17,22 +17,22 @@ ref_screen <-  gis_mets %>%
                                 #   select(OrgID,MLocID,StationDes,Lat_DD, Long_DD, HUC8_Name,HUC12_Name,GNIS_Name,EcoRegion2,EcoRegion3,EcoRegion4,COMID,
                                 #        rdden_km_km2,xings_km2,P_AgLand,P_Urban21Land,mines,grvl_mn_km2,P_canal) %>% 
   mutate(rd_Status = case_when(rdden_km_km2 <= 1.1854942 ~ 1,   # 25th
-                               rdden_km_km2 >= 4.0437531 ~ 2, # 90th
+                               rdden_km_km2 >= 4.9079551 ~ 2, # 95th
                                TRUE ~ 0)) %>%
   mutate(xing_Status = case_when(xings_km2 <= 0.10693475 ~ 1,   # 30th
-                                 xings_km2 >= 0.91400767 ~ 2,    # 90th
+                                 xings_km2 >= 1.35543470 ~ 2,    # 95th
                                  TRUE ~ 0)) %>%
   mutate(Ag_Status = case_when(P_AgLand <= 0 ~ 1,          # 25th 
-                               P_AgLand > 9.863038507 ~ 2,        # 90th
+                               P_AgLand > 30.045899737 ~ 2,        # 95th
                                TRUE ~ 0)) %>%
   mutate(Urb21L_Status = case_when(P_Urban21Land <= 1.5992877 ~ 1,  # 50th 
-                                   P_Urban21Land > 6.4403890 ~ 2,       # 90th
+                                   P_Urban21Land > 9.6508641 ~ 2,       # 95th
                                    TRUE ~ 0)) %>%
   mutate(mines_status = case_when(mines <= 0 ~ 1,      # 25th
-                                  mines > 4 ~ 2,       # 90th
+                                  mines > 15 ~ 2,       # 95th
                                   TRUE ~ 0)) %>% 
   mutate(gmines_status = case_when(grvl_mn_km2 <=0 ~ 1,     # 25th 
-                                   grvl_mn_km2 > 0.0007151642 ~ 2, # 90th
+                                   grvl_mn_km2 > 0.0048846532 ~ 2, # 95th
                                    TRUE ~ 0)) %>%
   mutate(canal_status = case_when(P_canal <=0 ~ 1,         # 25th
                                   P_canal > 2.551325 ~ 2,      # 95th - first non-zero
