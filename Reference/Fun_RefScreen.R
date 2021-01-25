@@ -1,6 +1,13 @@
+# Authors: Lesley Merrick and SHannon Hubler
+
+# objective: 1) create a function to classify stations based on GIS human disturbance screening metrics
+#            2) called and run within 'Run_Ref_Screen' code
+#            3) output then used to determine which sites move forward to GE Scoring
+
+
 
 #### Determine candidate reference sites from the GIS reference screening metrics###
-ref_screen <- function(gis_mets){
+ref_gis.screen <- function(gis_mets){
 require(RODBC)
 library(tidyverse)
 
@@ -9,7 +16,7 @@ sta.sql = odbcConnect('Stations')
 stations = sqlFetch(sta.sql, "VWStationsFinal") 
 odbcClose(sta.sql)
 
-# 2020 thresholds - variable thresholds based on metric - thresholds generated from Screening_Thresholds.R
+# 2020 thresholds - variable thresholds based on metric - thresholds generated from 'Screening_Thresholds.R'
 ref_screen <-  gis_mets %>% 
   left_join(stations, by = c('MLocId'= 'MLocID')) %>% # we need to add org to gis_mets , 'OrgID' = 'OrgID') 
   select(OrgID,MLocId,StationDes,Lat_DD, Long_DD, HUC8_Name,HUC12_Name,GNIS_Name,EcoRegion2,EcoRegion3,EcoRegion4,COMID,
@@ -45,6 +52,8 @@ ref_screen <- ref_screen %>%
 
 ref_screen$GIS.status_2020 <- as.factor(ref_screen$GIS.status_2020)   
 
+# create a column for East and West of Cascades crest, based on L3 Ecoregion
+# Also create a new field for abbreviated L3 Ecoregion #s
 ref_screen <- ref_screen %>%
   mutate(WorE = case_when(
     EcoRegion3 == '1' | EcoRegion3 == '3' | EcoRegion3 == '4' | EcoRegion3 == '78' ~ "W", 
@@ -61,8 +70,8 @@ ref_screen <- ref_screen %>%
     EcoRegion3 == "12" ~ "SRP"))
 ref_screen$WorE <- as.factor(ref_screen$WorE)    
 
-with(ref_screen, table(GIS.status_2020, WorE)) # summary table of Ref status by E/W
-with(ref_screen, table(GIS.status_2020, EcoRegion3))
+print(with(ref_screen, table(GIS.status_2020, WorE))) # summary table of Ref status by E/W
+print(with(ref_screen, table(GIS.status_2020, EcoRegion3)))
 
 
 # create a column for ref "GIS candidate" status = binary (Y or N) using DEQ 2020 thresholds
@@ -74,8 +83,6 @@ ref_screen <- ref_screen %>%
 ref_screen$GIS.status_2020.yn <- as.factor(ref_screen$GIS.status_2020.yn)    
 
 
-with(ref_screen, table(GIS.status_2020.yn, WorE)) # summary table of Ref status by E/W
-with(ref_screen, table(GIS.status_2020.yn, EcoRegion3))
 
 .GlobalEnv$ref_screen <- ref_screen 
-write.csv(ref_screen, "Reference/ref_screen_95th.csv")}
+write.csv(ref_screen, "Reference/ref_screen.DEQ.csv")}

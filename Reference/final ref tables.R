@@ -12,7 +12,7 @@ library(tidyverse)
 
 # bring in GIS outputs
 
-gis.deq <- read.csv('Reference/ref_screen.csv')
+gis.deq <- read.csv('Reference/ref_screen.DEQ.csv')
 
 gis.usu <- read.csv('Reference/ref_screen_USU.csv')
 
@@ -99,3 +99,30 @@ write.csv(gis.ge_usu, '//deqlab1/GIS_WA/Project_WOrking_Folders/Reference/2020/_
           row.names = FALSE)
 
 
+
+# One Table To Rule Them All
+
+d <- gis.ge_deq %>%
+  select(MLocId, StationDes, Lat_DD, Long_DD, Eco3, COMID, rdden_km_km2, xings_km2, P_AgLand, P_Urban21Land, mines, grvl_mn_km2, P_canal, 
+         rd_Status, xing_Status, Ag_Status, Urb21L_Status, mines_status, gmines_status, canal_status, GIS.status_2020, WorE, Disturb.score,
+         BPJ_final, Ref2020_FINAL)
+d <-  d %>%
+  mutate(owner ='DEQ')
+
+
+
+u <- gis.ge_usu %>%
+  select(MLocID, location, lat, long, Eco3, COMID, rdden_km_km2, xings_km2, P_AgLand, P_Urban21Land, mines, grvl_mn_km2, P_canal, 
+         rd_Status, xing_Status, Ag_Status, Urb21L_Status, mines_status, gmines_status, canal_status, GIS.status_2020, WorE, Disturb.score,
+         BPJ_final, Ref2020_FINAL)
+
+u <- setnames(u, c("MLocID", "location", "lat", "long"), c("MLocId", "StationDes", "Lat_DD", "Long_DD"))
+u <-  u %>%
+  mutate(owner ='DEQ')
+
+
+# Create One Summary table, covering site info + GIS screens + GE screens + FINAL REF
+one.table_rule.all <- rbind(d, u)
+
+write.csv(one.table_rule.all, 'Reference/one.table_rule.all.csv', row.names=FALSE)
+write.csv(one.table_rule.all, '//deqlab1/GIS_WA/Project_WOrking_Folders/Reference/2020/_Final outputs/one.table_rule.all.csv', row.names = FALSE)

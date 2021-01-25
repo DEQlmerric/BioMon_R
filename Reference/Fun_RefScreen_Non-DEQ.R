@@ -1,6 +1,14 @@
+# Authors: Lesley Merrick and SHannon Hubler
+
+# separate code for USU sites, due to varying input files
+
+# objective: 1) create a function to classify stations based on GIS human disturbance screening metrics
+#            2) called and run within 'Run_Ref_Screen' code
+#            3) output then used to determine which sites move forward to GE Scoring
+
 
 #### Determine candidate reference sites from the GIS reference screening metrics###
-ref_screen.nonDEQ <- function(gis_mets){
+ref_gis.screen.nonDEQ <- function(gis_mets){
 require(RODBC)
 library(tidyverse)
 
@@ -76,8 +84,6 @@ ref_screen <- ref_screen %>%
 ref_screen$GIS.status_2020.yn <- as.factor(ref_screen$GIS.status_2020.yn)    
 
 
-with(ref_screen, table(GIS.status_2020.yn, WorE)) # summary table of Ref status by E/W
-with(ref_screen, table(GIS.status_2020.yn, EcoRegion3))
 
 .GlobalEnv$ref_screen <- ref_screen 
 write.csv(ref_screen, "Reference/ref_screen_USU.csv")}

@@ -1,10 +1,10 @@
-
+# Author: Shannon Hubler
   
-# Google Earth Reference Screens: FINAL Scoring
-
-# 1) bring in GE Screen results.
-# 2) Re-format for calculations
-# 3) Calculate final site sum scores
+# Google Earth Reference Screens: FINAL Scoring (for DEQ sites)
+        
+        # 1) bring in GE Screen results.
+        # 2) Re-format for calculations
+        # 3) Calculate final site sum scores
 
 library(reshape2)
 require(tidyverse)
@@ -165,7 +165,8 @@ view(qc.site)
 
 
 
-# Adam's code - pull out BPJ Y and dist score >15 and BPJ N and dist score <15
+# pull out BPJ Y and dist score >15 and BPJ N and dist score <15
+# these outputs are then taken to the Reference Council for final BPJ review
 bpj_y_above<-subset(GE_Site_sum.scores, Scorer_BPJ=="Y" & Disturb.score >= 15)
 
 bpj_n_below<-subset(GE_Site_sum.scores, Scorer_BPJ=="N" & Disturb.score < 15)
@@ -184,10 +185,8 @@ bpj_question<-subset(GE_Site_sum.scores, Scorer_BPJ=="?" )
 
 # first, get single scores for a site on any given sample date 
 GE_Site_sum.scores_ave <- GE_Site_sum.scores %>%
-  #define what makes each roup unique
-  group_by(Agency_ID, Sample.date) %>%
-  #summarise the stats per group
-  summarize(mean(Disturb.score))
+  group_by(Agency_ID, Sample.date) %>%    #define what makes each group unique
+  summarize(mean(Disturb.score))          #summarise the stats per group
 
 
 
@@ -204,10 +203,8 @@ GE_Site_sum.scores_ave_repeats<- GE_Site_sum.scores_ave%>%
 
 # second, no significant score changes observed, average all samples per station
 GE_Site_sum.scores_ave <- GE_Site_sum.scores %>%
-  #define what makes each roup unique
-  group_by(Agency_ID) %>%
-  #summarise the stats per group
-  summarize(Disturb.score = mean(Disturb.score))
+  group_by(Agency_ID) %>%                            #define what makes each group unique
+  summarize(Disturb.score = mean(Disturb.score))     #summarise the stats per group
 
 
 
@@ -232,6 +229,10 @@ GE_Site_sum.scores_ave_bpj <- GE_Site_sum.scores_ave_bpj  %>%
                                    BPJ_final == 'Y'  ~ 'YES',
                                    BPJ_final == 'N'  ~ 'NO',
                                    TRUE ~ 'WhatchuTalkinBoutWillis'))
+
+
+GE_Site_sum.scores_ave_bpj$Ref2020_FINAL # look for "WhatchuTalkinBoutWillis--if any, will need to rectify
+
 
 # change Agency_ID to 'station_key' to match with stations table
 colnames(GE_Site_sum.scores_ave_bpj)[which(names(GE_Site_sum.scores_ave_bpj) == "Agency_ID")] <- "station_key"

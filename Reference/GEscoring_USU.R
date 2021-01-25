@@ -279,14 +279,8 @@ GE_Site_sum.scores_ave_bpj <- GE_Site_sum.scores_ave_bpj %>%
 
 
 # take the non-DEQ sites with 'NA' for MLocID and populate MLocID with station_key values
- 
-  #GE_Site_sum.scores_ave_bpj$MLocID <- as.factor(GE_Site_sum.scores_ave_bpj$MLocID)
-  #GE_Site_sum.scores_ave_bpj$station_key <- as.factor(GE_Site_sum.scores_ave_bpj$station_key)
-  
-
-#1 run this code
-        GE_Site_sum.scores_ave_bpj$MLocID <- ifelse(is.na(GE_Site_sum.scores_ave_bpj$MLocID), 
-            GE_Site_sum.scores_ave_bpj$station_key, GE_Site_sum.scores_ave_bpj$MLocID)
+GE_Site_sum.scores_ave_bpj$MLocID <- ifelse(is.na(GE_Site_sum.scores_ave_bpj$MLocID), 
+  GE_Site_sum.scores_ave_bpj$station_key, GE_Site_sum.scores_ave_bpj$MLocID)
 
 
    
@@ -312,7 +306,7 @@ gis.usu <- read_excel('//deqlab1/GIS_WA/Project_Working_Folders/Reference/2020/G
 gis.usu <- gis.usu %>%
   select(MLocID, station, lat, long, location,  EcoRegion3)
 
-
+library(data.table)
 setnames(gis.usu, old=c('station', 'lat', 'long', 'location'), 
          new=c('station_key', 'Lat_DD', 'Long_DD', 'StationDes'))
 

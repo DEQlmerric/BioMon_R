@@ -1,4 +1,12 @@
-### Run this to screen for candidate reference sites ### 
+# Authors: Lesley Merrick and Shannon Hubler
+
+# objective:  1) Run the function "ref_gis.screen" from 'Fun_RefScreem.R' 
+#             2) Take GIS screen metric outputs and classifies stations as GIS candidate reference sites, or trashed (highest disturbances)
+
+
+
+
+
 
 library(readxl)
 
@@ -9,7 +17,7 @@ gis_mets <- read_excel("//deqlab1/GIS_LIBRARY/Reference_Site_Selection/Ref_Scree
 
 
 source('Reference/Fun_RefScreen.R')
-ref_screen(gis_mets)
+ref_gis.screen(gis_mets)
 
 
 
@@ -41,5 +49,5 @@ gis_mets_USU<- rename(gis_mets_USU, EcoRegion3 = US_L3CODE)
 source('Reference/Fun_RefScreen_Non-DEQ.R')
 
 
-ref_screen.nonDEQ(gis_mets_USU)
+ref_gis.screen.nonDEQ(gis_mets_USU)
 
