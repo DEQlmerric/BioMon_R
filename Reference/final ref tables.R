@@ -146,3 +146,38 @@ write.csv(one.table_meta.data, '//deqlab1/GIS_WA/Project_WOrking_Folders/Referen
 
 
 
+############# 
+#
+# # #  HUMAN DISTURBANCE INDEX
+#
+############
+
+hdi <- read_excel('Reference/FC_HDI Checklist_main.xlsx',
+           sheet='Sheet1')
+
+require(RODBC)
+
+#connect to view as a general user 
+sta.sql = odbcConnect('Stations')
+#pull in stations table
+stations = sqlFetch(sta.sql, "VWStationsFinal") 
+odbcClose(sta.sql)
+
+stations <- stations %>%
+  select(station_key, MLocID)
+stations$station_key <- as.character(stations$station_key)
+
+hdi <- hdi %>%
+  left_join(stations, by=c('STATION_KEY' = 'station_key'))
+
+
+hdi<- hdi %>%
+  select(MLocID, LOC_NAME, DATE, Crew, AgUrb_score, Range_score, Roads_score, Silvicult_score, Misc_score, HDIreach, Ref_Site, RefSITE_COMM, 'BPJ Grade')
+
+
+
+one_hdi <- one.table_rule.all %>%
+  left_join(hdi, by=c('MLocId' = 'MLocID'))
+
+
+write.csv(one_hdi, 'Reference/one.table____hdi.csv')
