@@ -17,9 +17,9 @@ alt.usu_qc <- read_excel('//deqlab1/GIS_WA/Project_Working_Folders/Reference/202
 
 
 
-mbs.usu <- read_excel('//deqlab1/GIS_WA/Project_Working_Folders/Reference/2020/GE Screens/USU_all/GE_USU_REF_Screen_MBS.xlsx',
+mbs.usu <- read_excel('//deqlab1/GIS_WA/Project_Working_Folders/Reference/2020/GE Screens/USU_all/GE_USU_REF_Screen_MBS_FIXED.xlsx',
                       sheet='USU_MBS_2020')
-mbs.usu_qc <- read_excel('//deqlab1/GIS_WA/Project_Working_Folders/Reference/2020/GE Screens/USU_all/GE_USU_REF_Screen_MBS.xlsx',
+mbs.usu_qc <- read_excel('//deqlab1/GIS_WA/Project_Working_Folders/Reference/2020/GE Screens/USU_all/GE_USU_REF_Screen_MBS_FIXED.xlsx',
                          sheet='USU_ALL_2020')
 
 
