@@ -51,7 +51,7 @@ ge.deq_lim <- ge.deq %>%
   select(MLocID, Disturb.score, BPJ_final, Ref2020_FINAL)
 
 gis.ge_deq <- gis.deq %>%
-  full_join(ge.deq_lim, by = c('MLocId'='MLocID'))
+  full_join(ge.deq_lim, by = c('MLocID'))
 
 ########### change final ref status field, based on conditional status in multiple columns
 # 
@@ -59,13 +59,9 @@ gis.ge_deq$Ref2020_FINAL <- ifelse(is.na(gis.ge_deq$Ref2020_FINAL),
                             gis.ge_deq$GIS.status_2020, gis.ge_deq$Ref2020_FINAL)
 
 
-# one more time to deal with Ref_GIS.candidate showing up for weird sites wihtout Lat/Longs 
-@@@ 
-  @@@@@@ hopefully fix these weird unknown sites, remove permanently, then delete this section
-@@@
-  
-gis.ge_deq$Ref2020_FINAL <- ifelse(gis.ge_deq$Ref2020_FINAL=='Ref_GIS.candidate', 
-                                   'NO', gis.ge_deq$Ref2020_FINAL)
+
+                  # gis.ge_deq$Ref2020_FINAL <- ifelse(gis.ge_deq$Ref2020_FINAL=='Ref_GIS.candidate', 
+                  #                                    'NO', gis.ge_deq$Ref2020_FINAL)
 
 
 
@@ -92,7 +88,8 @@ gis.ge_usu$Ref2020_FINAL <- ifelse(is.na(gis.ge_usu$Ref2020_FINAL),
         
             
 
-
+gis.ge_usu$Ref2020_FINAL <- ifelse(gis.ge_usu$Ref2020_FINAL=='Ref_GIS.candidate', 
+                                  'NO', gis.ge_deq$Ref2020_FINAL)
 
 
 write.csv(gis.ge_usu, '//deqlab1/GIS_WA/Project_WOrking_Folders/Reference/2020/_Final outputs/FINAL.reference.2020_gis.ge_USU.csv',
@@ -103,7 +100,7 @@ write.csv(gis.ge_usu, '//deqlab1/GIS_WA/Project_WOrking_Folders/Reference/2020/_
 # One Table To Rule Them All
 
 d <- gis.ge_deq %>%
-  select(MLocId, StationDes, Lat_DD, Long_DD, Eco3, COMID, rdden_km_km2, xings_km2, P_AgLand, P_Urban21Land, mines, grvl_mn_km2, P_canal, 
+  select(MLocID, StationDes, Lat_DD, Long_DD, Eco3, COMID, rdden_km_km2, xings_km2, P_AgLand, P_Urban21Land, mines, grvl_mn_km2, P_canal, 
          rd_Status, xing_Status, Ag_Status, Urb21L_Status, mines_status, gmines_status, canal_status, GIS.status_2020, WorE, Disturb.score,
          BPJ_final, Ref2020_FINAL)
 d <-  d %>%
@@ -116,9 +113,9 @@ u <- gis.ge_usu %>%
          rd_Status, xing_Status, Ag_Status, Urb21L_Status, mines_status, gmines_status, canal_status, GIS.status_2020, WorE, Disturb.score,
          BPJ_final, Ref2020_FINAL)
 
-u <- setnames(u, c("MLocID", "location", "lat", "long"), c("MLocId", "StationDes", "Lat_DD", "Long_DD"))
+u <- setnames(u, c("location", "lat", "long"), c( "StationDes", "Lat_DD", "Long_DD"))
 u <-  u %>%
-  mutate(owner ='DEQ')
+  mutate(owner ='USU')
 
 
 # Create One Summary table, covering site info + GIS screens + GE screens + FINAL REF

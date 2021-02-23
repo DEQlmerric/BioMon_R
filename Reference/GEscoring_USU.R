@@ -174,8 +174,8 @@ ggplot(qc, aes(y=Agency_ID, x=Disturb.score, colour = Scorer)) +
 
 # select individual sites for review
 
-qc.site <- screens_wide[screens_wide$Agency_ID=='XN-SS-4120',]
-view(qc.site)
+      # qc.site <- screens_wide[screens_wide$Agency_ID=='XN-SS-4120',]
+      # view(qc.site)
 
 
 
@@ -189,6 +189,8 @@ bpj_question<-subset(GE_Site_sum.scores, Scorer_BPJ=="?"  | Scorer_BPJ == "N?")
 
           bpj.checks.usu <-rbind(bpj_n_below, bpj_question)
           write.csv(bpj.checks.usu, '//deqlab1/GIS_WA/Project_Working_Folders/Reference/2020/GE Screens/USU_all/bpj.checks.usu.csv')
+
+          
 #########
 #
 #
@@ -248,53 +250,40 @@ GE_Site_sum.scores_ave_bpj <- GE_Site_sum.scores_ave_bpj  %>%
                                    BPJ_final == 'N'  ~ 'NO',
                                    TRUE ~ 'WhatchuTalkinBoutWillis'))
 
-# change Agency_ID to 'station_key' to match with stations table
-colnames(GE_Site_sum.scores_ave_bpj)[which(names(GE_Site_sum.scores_ave_bpj) == "Agency_ID")] <- "station_key"
+# change Agency_ID to 'MLocID' to match with stations table
+colnames(GE_Site_sum.scores_ave_bpj)[which(names(GE_Site_sum.scores_ave_bpj) == "Agency_ID")] <- "MLocID"
 
 
 
 ###########
 
-# bring in station level data                                    
+# bring in station level data --USU sites not in Stations dbase, so need to get from GIS screens dataframe                                   
 
 ###########
 
-require(RODBC)
-
-#connect to view as a general user 
-sta.sql = odbcConnect('Stations')
-#pull in stations table
-stations = sqlFetch(sta.sql, "VWStationsFinal") 
-odbcClose(sta.sql)
-
-
-stations <- stations %>%
-  select(station_key, MLocID, StationDes, Lat_DD, Long_DD, EcoRegion3)
-
-stations$station_key <- as.character(stations$station_key)
-
-# merge with stations
-GE_Site_sum.scores_ave_bpj <- GE_Site_sum.scores_ave_bpj %>%
-  left_join(stations, by = 'station_key')
-
-
-# take the non-DEQ sites with 'NA' for MLocID and populate MLocID with station_key values
-GE_Site_sum.scores_ave_bpj$MLocID <- ifelse(is.na(GE_Site_sum.scores_ave_bpj$MLocID), 
-  GE_Site_sum.scores_ave_bpj$station_key, GE_Site_sum.scores_ave_bpj$MLocID)
+                              #' require(RODBC)
+                              #' 
+                              #' #connect to view as a general user 
+                              #' sta.sql = odbcConnect('Stations')
+                              #' #pull in stations table
+                              #' stations = sqlFetch(sta.sql, "VWStationsFinal") 
+                              #' odbcClose(sta.sql)
+                              #' 
+                              #' 
+                              #' stations <- stations %>%
+                              #'   select(MLocID, StationDes, Lat_DD, Long_DD, EcoRegion3)
+                              #' 
+                              #' 
+                              #' # merge with stations
+                              #' GE_Site_sum.scores_ave_bpj <- GE_Site_sum.scores_ave_bpj %>%
+                              #'   left_join(stations, by = 'MLocID')
+                              #' 
+                              #' @@@
+                              #'   @@@ The USU sites dont match with STATIONS, leaving NAs for most records
+                              #' @@@
 
 
-   
-
-#drop stations columns and re-merge with stations to get complete dataset
-GE_Site_sum.scores_ave_bpj <- GE_Site_sum.scores_ave_bpj %>%
-      select(MLocID, Disturb.score, BPJ_final, Ref2020_FINAL)
-
-
-stations <- subset(stations, select=-c(station_key))
-
-GE_Site_sum.scores_ave_bpj <- GE_Site_sum.scores_ave_bpj %>%
-  left_join(stations, by = 'MLocID')
-
+ 
 
 
 
@@ -304,11 +293,11 @@ gis.usu <- read_excel('//deqlab1/GIS_WA/Project_Working_Folders/Reference/2020/G
                       sheet='ref_screen')
 
 gis.usu <- gis.usu %>%
-  select(MLocID, station, lat, long, location,  EcoRegion3)
+  select(MLocID, lat, long, location,  EcoRegion3)
 
 library(data.table)
-setnames(gis.usu, old=c('station', 'lat', 'long', 'location'), 
-         new=c('station_key', 'Lat_DD', 'Long_DD', 'StationDes'))
+setnames(gis.usu, old=c('lat', 'long', 'location'), 
+         new=c( 'Lat_DD', 'Long_DD', 'StationDes'))
 
 GE_Site_sum.scores_ave_bpj <- GE_Site_sum.scores_ave_bpj %>%
   select(MLocID, Disturb.score, BPJ_final, Ref2020_FINAL) # this drops out DEQ station info....

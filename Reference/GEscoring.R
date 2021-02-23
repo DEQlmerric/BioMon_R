@@ -43,7 +43,9 @@ screens_long <- melt(screens,
 
 
 ### List of QC sites (21855 and 33338 MAY be extras, can ignore)
-qc_sites <- c(13244, 17007, 17048, 21855, 21864, 21865, 21868, 21884, 23856, 24453, 26854, 26952, 30354, 30625, 31354, 31387, 33338, 35716, 35732, 35733, 35734, 35792)
+qc_sites <- c('13244-ORDEQ', '17007-ORDEQ', '17048-ORDEQ', '21855-ORDEQ', '21864-ORDEQ', '21865-ORDEQ', '21868-ORDEQ', '21884-ORDEQ', '23856-ORDEQ',
+              '24453-ORDEQ', '26854-ORDEQ', '26952-ORDEQ', '30354-ORDEQ', '30625-ORDEQ', '31354-ORDEQ', '31387-ORDEQ', '33338-ORDEQ', '35716-ORDEQ', 
+              '35732-ORDEQ', '35733-ORDEQ', '35734-ORDEQ', '35792-ORDEQ')
 
 
          
@@ -159,8 +161,8 @@ ggplot(qc, aes(y=Agency_ID, x=Disturb.score, colour = Scorer)) +
 
 # select individual sites for review
 
-qc.site <- screens_wide[screens_wide$Agency_ID=='26952',]
-view(qc.site)
+        #qc.site <- screens_wide[screens_wide$Agency_ID=='26952',]
+        #view(qc.site)
 
 
 
@@ -207,6 +209,13 @@ GE_Site_sum.scores_ave <- GE_Site_sum.scores %>%
   summarize(Disturb.score = mean(Disturb.score))     #summarise the stats per group
 
 
+########
+########
+        ###
+          ####  Bring in Final BPJ designations
+        ###
+########
+########
 
 # combine single disturb scores per station, with final BPJ status
 bpj.final <- read.csv('//deqlab1/GIS_WA/Project_Working_Folders/Reference/2020/GE Screens/Screen results/FINAL_BPJ_2021.csv')
@@ -234,14 +243,14 @@ GE_Site_sum.scores_ave_bpj <- GE_Site_sum.scores_ave_bpj  %>%
 GE_Site_sum.scores_ave_bpj$Ref2020_FINAL # look for "WhatchuTalkinBoutWillis--if any, will need to rectify
 
 
-# change Agency_ID to 'station_key' to match with stations table
-colnames(GE_Site_sum.scores_ave_bpj)[which(names(GE_Site_sum.scores_ave_bpj) == "Agency_ID")] <- "station_key"
+# change Agency_ID to 'MLocID' to match with stations table
+colnames(GE_Site_sum.scores_ave_bpj)[which(names(GE_Site_sum.scores_ave_bpj) == "Agency_ID")] <- "MLocID"
 
 
 
 ##############
 
-# join GE and station info together
+                # join GE and station info together
 
 ##############
 
@@ -257,29 +266,14 @@ odbcClose(sta.sql)
 
 # cut down to essential columns
 stations <- stations %>%
-  select(station_key, MLocID, StationDes, Lat_DD, Long_DD, EcoRegion3)
+  select(MLocID, StationDes, Lat_DD, Long_DD, EcoRegion3)
 
-stations$station_key <- as.character(stations$station_key)
+
 
 # merge with stations
 GE_Site_sum.scores_ave_bpj <- GE_Site_sum.scores_ave_bpj %>%
-  left_join(stations, by = 'station_key')
-
-
-# take the non-DEQ sites with 'NA' for MLocID and populate MLocID with station_key values
-GE_Site_sum.scores_ave_bpj$MLocID <- ifelse(is.na(GE_Site_sum.scores_ave_bpj$MLocID), 
-        GE_Site_sum.scores_ave_bpj$station_key, GE_Site_sum.scores_ave_bpj$MLocID)
-
-
-#drop stations columns and re-merge with stations to get complete dataset
-GE_Site_sum.scores_ave_bpj <- GE_Site_sum.scores_ave_bpj %>%
-  select(MLocID, station_key, Disturb.score, BPJ_final, Ref2020_FINAL)
-
-
-stations <- subset(stations, select=-c(station_key))
-
-GE_Site_sum.scores_ave_bpj <- GE_Site_sum.scores_ave_bpj %>%
   left_join(stations, by = 'MLocID')
+
 
 
 ref2020.sites_FINAL <- GE_Site_sum.scores_ave_bpj[GE_Site_sum.scores_ave_bpj$Ref2020_FINAL=='YES',]
@@ -289,10 +283,6 @@ ref2020.sites_FINAL <- GE_Site_sum.scores_ave_bpj[GE_Site_sum.scores_ave_bpj$Ref
 write.csv(ref2020.sites_FINAL, '//deqlab1/GIS_WA/Project_Working_Folders/Reference/2020/_Final outputs/REF.sites.only_2020_FINAL_DEQ.csv')
 
 
-# look at ref population
-
-with(GE_Site_sum.scores_ave_bpj, table(Ref2020_FINAL))
-with(GE_Site_sum.scores_ave_bpj, table(Ref2020_FINAL, EcoRegion3))
 
 
 
