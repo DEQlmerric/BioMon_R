@@ -55,6 +55,9 @@ taxonomy <- taxonomy %>%
     
 
 
+
+###
+
 # join bugs and taxonomy tables
 b_t <- bugs %>% 
        left_join(taxonomy, by = c('DEQ_TAXON')) 
