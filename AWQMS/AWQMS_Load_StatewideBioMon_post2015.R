@@ -13,7 +13,7 @@ hybrid_taxon <- sqlFetch(bio.sql,"dbo.Taxon_DEQ") %>%
 # this is the downloaded AWQMS taxon table. I don't know the best way to get this integrated without downloaded the lastest version each time. 
 awqms_t <- read_excel("//deqlab1/BioMon/Databases/RawData_to_AWQMS/AWQMS_Taxon_19jan2021.xlsx", sheet = "Taxon")
 
-# Use AWQMSdata to pull data for results in AWQMS - 
+#### Use AWQMSdata to pull data for results in AWQMS - ####
 swb <- AWQMS_Data(startdate = "2015-01-15", enddate = NULL, project = 'Statewide Biomonitoring') 
 swb_actid <- swb %>% 
   select(act_id,MLocID,SampleStartDate,Project1) %>%
@@ -25,18 +25,40 @@ swb_actid <- swb %>%
 write.csv(swb_actid,"swb_actid2.csv")
 # ended up giving up on joins and manually assigned act_id based on SVN 
 ai<- read.csv("ai_sum.csv")
-# source of .xlxs Biomon_Phoenix_for SQL migration_FINAL.mdb as excel file 
+
+##### source of .xlxs Biomon_Phoenix_for SQL migration_FINAL.mdb as excel file  #####
 Samp <- read_excel("//deqlab1/BioMon/Databases/RawData_to_AWQMS/invert_sample_info_11Jan2021.xlsx", sheet = "Sheet1") %>%
   select(SVN,Project,Comments,Methods_ok,Taxonomist,Subsample_percent_value,Area_sampled) %>%  #seems like this is all I need
   rename(act_comments = Comments)
-counts <- read_excel("//deqlab1/BioMon/Databases/RawData_to_AWQMS/invert_count_11Jan2021.xlsx", sheet = "Invert_count")
-
-#### pull in a test data set from Biomon_Phoenix_for SQL migration_FINAL.mdb as excel file  ####
-Samp <- read_excel("//deqlab1/BioMon/Databases/RawData_to_AWQMS/Lady/ChemData_bug.xlsx", sheet = "Sample_Info") %>%
-  select(SVN,Comments,Methods_ok,Taxonomist) %>%  #seems like this is all I need
+Samp <- read_excel("//deqlab1/BioMon/Databases/RawData_to_AWQMS/invert_sample_info_11Jan2021.xlsx", sheet = "Sheet1") %>%
+  select(SVN,Project,Comments,Methods_ok,Fixed_Count,Taxonomist,Subsample_percent_value,Area_sampled) %>%  #seems like this is all I need
   rename(act_comments = Comments)
-counts <- read_excel("//deqlab1/BioMon/Databases/RawData_to_AWQMS/Lady/ChemData_bug.xlsx", sheet = "invert_count")
-act_id <- read_excel("//deqlab1/BioMon/Databases/RawData_to_AWQMS/Lady/ChemData_bug.xlsx", sheet = "act_id") # I formatted this in excel 
+counts <- read_excel("//deqlab1/BioMon/Databases/RawData_to_AWQMS/invert_count_11Jan2021.xlsx", sheet = "Invert_count") %>%
+  filter(!TAXON_CODE %in% c('DIP900601','PLE','DIP511','DIP','DIP045','ODO','DIP210415','DIP940051','CHI795', #these were determined to be 
+                            'CHI9734','DIP90','TRI1631'), #these were determined to be errors and couldn't be reconciled
+         !SVN == '08102DFW') %>% #extra sample??
+  mutate(TAXON_CODE = case_when(TAXON_CODE == 'CHi420'~ 'CHI420',
+                                TAXON_CODE == 'Zavrelimyia'~ 'CHI920',
+                                TAXON_CODE == 'COL106'~ 'COL100',
+                                TAXON_CODE == 'COL218'~ 'COL200',
+                                TAXON_CODE == 'COl290'~ 'COL290',
+                                TAXON_CODE == 'CRU850'~ 'CRU800',
+                                TAXON_CODE == 'CRU850'~ 'CRU800',
+                                TAXON_CODE %in% c('EPH137','EPH138','EPH132','EPH133','EPH134','EPH131','EPH139') ~ 'EPH100',
+                                TAXON_CODE == 'EH165'~ 'EPH165',
+                                TAXON_CODE == 'Matriella teresa'~ 'EPH351',
+                                TAXON_CODE == 'Ephemerella tibialis'~ 'EPH352',
+                                TAXON_CODE %in% c('HYD005','HYD00','HYD008') ~ 'HYD000',
+                                TAXON_CODE == 'PEL140'~ 'PEL100',
+                                TAXON_CODE == 'PlE627'~ 'PLE627',
+                                TAXON_CODE == 'TR036'~ 'TRI036',
+                                TAXON_CODE == 'TR037'~ 'TRI037',
+                                TAXON_CODE == 'Rhyacophila vetina complex'~ 'TRI1210',
+                                TAXON_CODE == 'TRI675'~ 'TRI600',
+                                TAXON_CODE == 'TR695'~ 'TRI695',
+                                TRUE ~ TAXON_CODE))
+
+
 
 #### generate AWQMS upload ####
 d_count <- counts %>% 
@@ -44,8 +66,6 @@ d_count <- counts %>%
   filter(Project == 'Reference Trend') %>%
   left_join(hybrid_taxon,by = 'TAXON_CODE') %>%
   left_join(awqms_t, by = c('AWQMS_tax_uid'= 'UID')) %>%
-  left_join(ai, by = 'SVN') %>%
-  #left_join(swb_actid, by = c('MLocID' = 'MLocID','Date' = 'SampleStartDate')) %>% 
   mutate(colmeth = case_when(Habitat_sampled == 'R' ~ "Benthic Kick - Riffle",
                              Habitat_sampled == 'T' ~ "Benthic Kick - Transect",
                              TRUE ~ as.character('Benthic Kick - Mixed')),
@@ -73,7 +93,8 @@ d_count <- counts %>%
          speciesID = if_else(UniqueTaxon == 'Yes', 'UniqueTaxon','AmbiguousTaxon'),
          habit = "",
          Project1 = 'Statewide Biomonitoring') %>%
-  #act_id = paste(act_id,act_type,'BENTHIC', sep = '-')) %>% # still have to figure out the multiple duplicates 
+         mutate(Date4Id = strftime(Date, format = '%Y%m%d', tz = 'UTC'),
+         act_id = paste(MLocID,Date4Id,as.character(Habitat_sampled),act_type,sep =":")) %>%
   select(act_id,act_type,media,Date,Project1,MLocID,assemblage,act_comments,colmeth,equip,char,Count,unit,
          status,qual,value,Name,StageID,habit,FFG,Voltine,speciesID,intent,Comments,method,context,DEQ_TAXON,SVN) %>%  ## missing Taxonomy_lab, FFG,Volt from taxa table
   rename(result = Count)
@@ -84,7 +105,6 @@ d_density <- counts %>%
   filter(!(is.na(Subsample_percent_value))) %>%
   left_join(hybrid_taxon,by = 'TAXON_CODE') %>%
   left_join(awqms_t, by = c('AWQMS_tax_uid'= 'UID')) %>%
-  left_join(ai, by = 'SVN') %>% 
   mutate(colmeth = case_when(Habitat_sampled == 'R' ~ "Benthic Kick - Riffle",
                              Habitat_sampled == 'T' ~ "Benthic Kick - Transect",
                              TRUE ~ as.character('Benthic Kick - Mixed')),
@@ -101,7 +121,7 @@ d_density <- counts %>%
          assemblage = 'Benthic Macroinvertebrates',
          equip = 'D-Frame Net',
          char = 'Density',
-         result = (Count/Area_sampled)*(Subsample_percent_value),
+         result = (Count/(Area_sampled*Subsample_percent_value)),
          unit = '#/ft2',
          status = if_else(Methods_ok == 'Yes','Final','Rejected'),
          value = 'Actual', #when would this be estimated? 
@@ -113,7 +133,8 @@ d_density <- counts %>%
          speciesID = if_else(UniqueTaxon == 'Yes', 'UniqueTaxon','AmbiguousTaxon'),
          habit = "",
          Project1 = 'Statewide Biomonitoring') %>%
-  #act_id = paste(act_id,act_type,'BENTHIC', sep = '-')) %>% # still have to figure out the multiple duplicates 
+  mutate(Date4Id = strftime(Date, format = '%Y%m%d', tz = 'UTC'),
+         act_id = paste(MLocID,Date4Id,as.character(Habitat_sampled),act_type,sep =":")) %>%
   select(act_id,act_type,media,Date,Project1,MLocID,assemblage,act_comments,colmeth,equip,char,result,unit,
          status,qual,value,Name,StageID,habit,FFG,Voltine,speciesID,intent,Comments,method,context,DEQ_TAXON,SVN)  ## missing Taxonomy_lab, FFG,Volt from taxa table
 # bring both together 
@@ -135,4 +156,4 @@ act_id_sum <- d %>%
   group_by(act_id) %>%
   summarise(n= n())  
 
-write.csv(d,"//deqlab1/BioMon/Databases/RawData_to_AWQMS/Statewide Biomonitoring_4.csv") 
+write.csv(d,"//deqlab1/BioMon/Databases/RawData_to_AWQMS/statewidebio_fixed.csv",na = "",row.names = FALSE) 
