@@ -238,10 +238,10 @@ sample.info_USU <- sample.info_USU %>%
                 @@@@@@@
   
   
-  # Final USU "BugSample" table -- put in correct order
-  sample.info_USU <- sample.info_USU %>%
-  select(act_id, Station, SampDate, SampleTime, Method, Habitat, Area, FieldSplit, FieldNotes, 
-         LabSplit, Qualitative, LabNotes, Mesh, Count)
+# Final USU "BugSample" table -- put in correct order
+sample.info_USU <- sample.info_USU %>%
+select(act_id, Station, SampDate, SampleTime, Method, Habitat, Area, FieldSplit, FieldNotes, 
+       LabSplit, Qualitative, LabNotes, Mesh, Count, Lab.name)
 
 
 
