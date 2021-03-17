@@ -196,6 +196,13 @@ sample.info_USU$SampleStart_Date <- as.Date(sample.info_USU$SampleStart_Date)
 
 sample.info_USU <- sample.info_USU[sample.info_USU$SampleStart_Date > "1999-01-01",]
 
+sample.info_USU <- sample.info_USU %>% 
+  mutate(Lab.name = case_when(SampleStart_Date > '1999-01-01' & SampleStart_Date < '2001-12-31' ~ 'Rhithron',
+                              SampleStart_Date > '2002-01-01' & SampleStart_Date < '2008-12-31' ~ 'Kate.Parkin',
+                              SampleStart_Date > '2009-01-01' & SampleStart_Date < '2012-12-31' ~ 'Cole.Ecological',
+                              SampleStart_Date > '2013-01-01' & SampleStart_Date < '2017-12-31' ~ 'Rhithron',
+                              SampleStart_Date > '2018-01-01' & SampleStart_Date < '2019-12-31' ~ 'Cole.Ecological',
+                              TRUE ~ 'ERROR'))
 
 # create table, in order as called for by USU
 sample.info_USU <- sample.info_USU %>% 
