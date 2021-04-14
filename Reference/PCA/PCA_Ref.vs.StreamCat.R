@@ -112,7 +112,7 @@ ref.cat_trans$PctNonCarbResidWs <- asin(sqrt(ref.cat_trans$PctNonCarbResidWs/100
 log.10p1 <- function(x, na.rm = FALSE) (log10(x +1)) #, na.rm = na.rm))
 log.10 <- function(x, na.rm = FALSE) (log10(x))      #, na.rm = na.rm))
 asin.sqrt.100 <- function(x, na.rm = FALSE) (asin(sqrt(x/100))) #, na.rm = na.rm)))
-sqrt <- function(x, na.rm = FALSE) (sqrt(x))         #, na.rm = na.rm))
+sqrt2 <- function(x, na.rm = FALSE) (sqrt(x))         #, na.rm = na.rm))
 
 
 
@@ -124,7 +124,7 @@ ref.cat_complete <- ref.cat_complete %>%
 # verify it worked
 
 ref.cat_complete <- ref.cat_complete %>% 
-  mutate_at(c('CompStrgthWs'), sqrt)  
+  mutate_at(c('CompStrgthWs'), sqrt2)  
 
 ref.cat_complete <- ref.cat_complete %>% 
   mutate_at(c('PctNonCarbResidWs', 'PctSilicicWs'), asin.sqrt.100)  
