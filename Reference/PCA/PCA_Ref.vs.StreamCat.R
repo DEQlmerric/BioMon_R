@@ -75,7 +75,7 @@ ref.cat_complete <- ref.cat[complete.cases(ref.cat), ]
   
                 # data transformations for PCA: normal distributions an assumption for linear relationships
                 #source("//deqlab1/Biomon/R Stats/chris parker scripts/transform.variables[1]_SH divide by 100.r")
-
+                #transform.view(ref.cat[,c(27:65)])
   
 # example of data transformation, without saving
   
@@ -83,24 +83,9 @@ log10(ref.cat_complete$PctNonCarbResidWs)
 sqrt(ref.cat_complete$PctNonCarbResidWs)
 asin(sqrt(ref.cat_complete$PctNonCarbResidWs/100))
                 
-                #transform.view(ref.cat[,c(27:65)])
+                
 
-log.10p1 <- function(x, na.rm = FALSE) (log10(x +1)) #, na.rm = na.rm))
-log.10 <- function(x, na.rm = FALSE) (log10(x))      #, na.rm = na.rm))
-asin.sqrt.100 <- function(x, na.rm = FALSE) (asin(sqrt(x/100))) #, na.rm = na.rm)))
-sqrt <- function(x, na.rm = FALSE) (sqrt(x))         #, na.rm = na.rm))
 
-            ref.cat_complete <- ref.cat_complete %>% 
-              mutate_at(c('PctNonCarbResidWs', 'PctSilicicWs'), asin.sqrt.100)  
-              # summary(ref.cat$PctNonCarbResidWs); summary(ref.cat_complete$PctNonCarbResidWs)
-            
-            ref.cat_complete <- ref.cat_complete %>% 
-              mutate_at(c('CompStrgthWs'), sqrt)  
-            
-            
-            ref.cat_complete <- ref.cat_complete %>% 
-              mutate_at(c('WsAreaSqKm', 'ElevWs','MgOWs'), log.10p1)  %>% 
-              mutate_at(c('SWs', 'NWs','HydrlCondWs'), log.10)  
             
 # create a new df for assessing PCA with transformed variables
 ref.cat_trans <- ref.cat_complete
@@ -119,8 +104,30 @@ ref.cat_complete <- ref.cat_complete %>%
 
   
 # data transformations
+
+# simple, one column at a time
 ref.cat_trans$PctNonCarbResidWs <- asin(sqrt(ref.cat_trans$PctNonCarbResidWs/100))
 
+# use a formula and dplyr for multiple columns
+log.10p1 <- function(x, na.rm = FALSE) (log10(x +1)) #, na.rm = na.rm))
+log.10 <- function(x, na.rm = FALSE) (log10(x))      #, na.rm = na.rm))
+asin.sqrt.100 <- function(x, na.rm = FALSE) (asin(sqrt(x/100))) #, na.rm = na.rm)))
+sqrt <- function(x, na.rm = FALSE) (sqrt(x))         #, na.rm = na.rm))
+
+
+
+ref.cat_complete <- ref.cat_complete %>% 
+  mutate_at(c('WsAreaSqKm', 'ElevWs','MgOWs'), log.10p1)  %>% 
+  mutate_at(c('SWs', 'NWs','HydrlCondWs'), log.10)  
+
+# summary(ref.cat$PctNonCarbResidWs); summary(ref.cat_complete$PctNonCarbResidWs) 
+# verify it worked
+
+ref.cat_complete <- ref.cat_complete %>% 
+  mutate_at(c('CompStrgthWs'), sqrt)  
+
+ref.cat_complete <- ref.cat_complete %>% 
+  mutate_at(c('PctNonCarbResidWs', 'PctSilicicWs'), asin.sqrt.100)  
 
 
 
