@@ -223,7 +223,7 @@ GE_Site_sum.scores_ave <- GE_Site_sum.scores %>%
 ########
 
 # combine single disturb scores per station, with final BPJ status
-bpj.final <- read.csv('//deqlab1/GIS_WA/Project_Working_Folders/Reference/2020/GE Screens/Screen results/FINAL_BPJ_2021.csv')
+bpj.final <- read.csv('//deqlab1/GIS_WA/Project_Working_Folders/Reference/2020/GE_Screens/Screen results/FINAL_BPJ_2021.csv')
 
 bpj.final <- bpj.final%>%
   select(Agency_ID, BPJ_final)
