@@ -77,14 +77,6 @@ ref.cat_complete <- ref.cat[complete.cases(ref.cat), ]
                 #source("//deqlab1/Biomon/R Stats/chris parker scripts/transform.variables[1]_SH divide by 100.r")
                 #transform.view(ref.cat[,c(27:65)])
   
-# example of data transformation, without saving
-  
-log10(ref.cat_complete$PctNonCarbResidWs)
-sqrt(ref.cat_complete$PctNonCarbResidWs)
-asin(sqrt(ref.cat_complete$PctNonCarbResidWs/100))
-                
-                
-
 
             
 # create a new df for assessing PCA with transformed variables
@@ -105,8 +97,6 @@ ref.cat_complete <- ref.cat_complete %>%
   
 # data transformations
 
-# simple, one column at a time
-ref.cat_trans$PctNonCarbResidWs <- asin(sqrt(ref.cat_trans$PctNonCarbResidWs/100))
 
 # use a formula and dplyr for multiple columns
 log.10p1 <- function(x, na.rm = FALSE) (log10(x +1)) #, na.rm = na.rm))
@@ -116,23 +106,23 @@ sqrt2 <- function(x, na.rm = FALSE) (sqrt(x))         #, na.rm = na.rm))
 
 
 
-ref.cat_complete <- ref.cat_complete %>% 
+ref.cat_trans <- ref.cat_trans %>% 
   mutate_at(c('WsAreaSqKm', 'ElevWs','MgOWs'), log.10p1)  %>% 
   mutate_at(c('SWs', 'NWs','HydrlCondWs'), log.10)  
 
 # summary(ref.cat$PctNonCarbResidWs); summary(ref.cat_complete$PctNonCarbResidWs) 
 # verify it worked
 
-ref.cat_complete <- ref.cat_complete %>% 
+ref.cat_trans <- ref.cat_trans %>% 
   mutate_at(c('CompStrgthWs'), sqrt2)  
 
-ref.cat_complete <- ref.cat_complete %>% 
+ref.cat_trans <- ref.cat_trans %>% 
   mutate_at(c('PctNonCarbResidWs', 'PctSilicicWs'), asin.sqrt.100)  
 
 
 
   
-# run PCA
+# run PCA______choose transformed (ref.cat_trans) or non-transformed (ref.cat_complete)
 library(FactoMineR)  
 library("factoextra")
 library("corrplot")
@@ -207,7 +197,7 @@ fviz_pca_var(pca.allsites, col.var = grp,
 # Eco3
 fviz_pca_ind(pca.allsites,
              geom.ind = "point", # show points only (nbut not "text")
-             col.ind = ref.cat$Eco3, # color by groups
+             col.ind = ref.cat_trans$Eco3, # color by groups
              palette = 'lancet', #c('violet', 'blue', 'green', 'gray', 'orange', 'red', 'pink', 'black', 'forest green'),
              addEllipses = TRUE, # Concentration ellipses
              legend.title = "Groups"
@@ -216,7 +206,7 @@ fviz_pca_ind(pca.allsites,
 # Ref 2020
 fviz_pca_ind(pca.allsites,
              geom.ind = 'point', # show points only (nbut not "text")
-             col.ind = ref.cat$Ref2020_FINAL, # color by groups
+             col.ind = ref.cat_trans$Ref2020_FINAL, # color by groups
              palette = c('forest green', 'blue', 'red'),
              addEllipses = TRUE, # Concentration ellipses
              legend.title = 'Ref Class 2016')
@@ -224,7 +214,7 @@ fviz_pca_ind(pca.allsites,
 # Owner
 fviz_pca_ind(pca.allsites,
              geom.ind = 'point', # show points only (nbut not "text")
-             col.ind = ref.cat$owner, # color by groups
+             col.ind = ref.cat_trans$owner, # color by groups
              palette = c('forest green', 'blue', 'red'),
              #addEllipses = TRUE, # Concentration ellipses
              legend.title = 'Ref class 2020')
@@ -248,7 +238,7 @@ fviz_pca_biplot(pca.allsites,
                 geom.ind = "point",
                 pointshape = 21,
                 pointsize = 2,
-                fill.ind = ref.cat$Eco3,
+                fill.ind = ref.cat_trans$Eco3,
                 col.ind = "black",
                 # Color variable by groups
                 #col.var = factor(c("sepal", "sepal", "petal", "petal")),
@@ -268,7 +258,7 @@ fviz_pca_ind(pca.allsites,
              geom.ind = "point",
              pointshape = 21,
              pointsize = 2,
-             fill.ind = ref.cat$Eco3, 
+             fill.ind = ref.cat_trans$Eco3, 
              addEllipses = TRUE,
              #col.ind = "black",
              # Color variable by groups
@@ -284,20 +274,20 @@ fviz_pca_ind(pca.allsites,
 fviz_pca_ind(pca.allsites,
              geom.ind = "point", # show points only (but not "text")
              pointshape = 21,
-             pointsize = ref.cat$Ref2020_FINAL,
-             fill.ind = ref.cat$Eco3, # color by groups
+             pointsize = ref.cat_trans$Ref2020_FINAL,
+             fill.ind = ref.cat_trans$Eco3, # color by groups
              palette = c('purple', 'blue', 'green', 'orange', 'red', 'gray', 'pink', 'black', 'forest green'), 
              addEllipses = FALSE, # Concentration ellipses
-             legend.title = "Groups"
-) 
+             legend.title = "Groups")+
+  scale_shape_manual(values=c(19,20,21))
 
 
 
 fviz_pca_biplot(pca.allsites,
                 geom.ind = "point", # show points only (nbut not "text")
-                pointshape = 21,
-                pointsize = ref.cat$Ref2020_FINAL,
-                fill.ind = ref.cat$Eco3, # color by groups
+                pointshape = 21 ,
+                pointsize = ref.cat_trans$Ref2020_FINAL,
+                fill.ind = ref.cat_trans$Eco3, # color by groups
                 palette = c('purple', 'blue', 'green', 'orange', 'red', 'gray', 'black','yellow',  'forest green'), 
                 addEllipses = FALSE, # Concentration ellipses
                 select.var = list(cos2  = 0.5),  # opnly include variables with cos2 > 0.5
@@ -324,8 +314,39 @@ pca.plot.refs<-
 ggsave(pca.plot.refs, filename="PeteFigures011013/pca.plot.refs.eps",width=10, height=8, units="in") 
 
 
+ 
+
+
+
+# Summary stats
+
+
+ref.cat_nat <- ref.cat_complete[ , c(25, 27:51)] 
+
+ref.cat_nat <- ref.cat_nat %>% 
+  pivot_longer(!Ref2020_FINAL, names_to = "Metric", values_to = "Value")
 
 
 
 
+sum.stats <- ref.cat_nat %>%
+  group_by(Metric, Ref2020_FINAL)%>%
+  summarise(
+    n = n(),
+    min = min(Value),
+    max = max(Value),
+    mean = mean(Value),
+    SD = sd(Value)
+    )
 
+
+
+
+sum.stats_long <- sum.stats %>%
+  pivot_longer(!c(Metric, Ref2020_FINAL), names_to = "stat", values_to = 'Value')
+
+
+sum.stats_final <- sum.stats_long %>% 
+  pivot_wider(names_from = c(Ref2020_FINAL, stat), values_from = Value)
+
+write.csv(sum.stats_final, 'Reference/PCA/sum.stats.csv')

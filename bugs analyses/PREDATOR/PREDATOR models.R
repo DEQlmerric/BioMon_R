@@ -41,7 +41,10 @@ library(data.table)
 
 # first, get counts from Taxon/Taxon_Code ----> OTUs (no ambuiguous taxa)
 
-b.oe<-aggregate(b_t_s$Count,  list(Sample=b_t_s$Sample, OTU=b_t_s$OTU_RIV05_Nov05, MLocID=b_t_s$MLocID,  STATION_KEY=b_t_s$STATION_KEY, 
+
+
+
+b.oe<-aggregate(b_t_s$Count,  list(Sample=b_t_s$Sample, OTU=b_t_s$OTU_RIV05_Nov05, MLocID=b_t_s$MLocID,  
                                  Eco2=b_t_s$Eco2, Eco3=b_t_s$Eco3), sum )# For each OTU in a Sample, sum the Counts
 
 colnames(b.oe)
@@ -108,7 +111,7 @@ b.rare.seed <- rarify.seed(na.omit(b.oe), 'Sample', 'Count', 300)
 ######
 
 
-tot.abund.RIV<-aggregate(b.rare.seed$Count, list(Sample=b.rare.seed$Sample, STATION_KEY=b.rare.seed$STATION_KEY), sum)
+tot.abund.RIV<-aggregate(b.rare.seed$Count, list(Sample=b.rare.seed$Sample, MLocID=b.rare.seed$MLocID), sum)
 names(tot.abund.RIV)[3]<-'tot.abund.RIV'
 
 
@@ -120,7 +123,7 @@ names(tot.abund.RIV)[3]<-'tot.abund.RIV'
 
 
 dm.rare<- melt(b.rare.seed, measure.var = 'Count') 
-bugs.all <- dcast(dm.rare, Sample+STATION_KEY+Eco2+Eco3 ~ OTU, fun.aggregate = sum) # Sample x OTU doesn't seem to be unique so you need the fun.aggregate.  
+bugs.all <- dcast(dm.rare, Sample+MLocID+Eco2+Eco3 ~ OTU, fun.aggregate = sum) # Sample x OTU doesn't seem to be unique so you need the fun.aggregate.  
 head(bugs.all)
 
 
@@ -154,12 +157,7 @@ it doesnt show up in outputs when running through functions
             
             table(check.wccp.wibr) # if 'Doh!', there's a problem
             
-            
-            @@@@
-              @@@@@
-            @@@@
-            
-  
+         
   
   
   
@@ -186,15 +184,15 @@ table(bugs.NBR$Eco2, bugs.NBR$Eco3) # All samples must be from WIBR -- no Eco3 s
 ###
 
 
-# get single records of Samples (SVN) and Stations (STATION_KEY)
-b.samps.sta<-unique(b_t_s[,c('Sample', 'MLocID', 'STATION_KEY', 'Date', 'Habitat', 'Activity_Type','long', 'lat',
+# get single records of Samples (SVN) and Stations (MLocID)
+b.samps.sta<-unique(b_t_s[,c('Sample', 'MLocID', 'Date', 'Habitat', 'Activity_Type','long', 'lat',
                          'temp_Cx10', 'precip_mm','Eco2', 'Eco3', 'ELEV_m', 'W_E')])   
           # use unique records so that they can be matched with predictors from Station table
 
 
                               # b.samps.sta<-merge(b.samps, stations.ref, by="MLocID", all.x=TRUE, suffix=c("", ".y"))   
                               # #setnames(b.samps.sta, old = c('LAT_field.x', 'LONG_field.x'), new = c('LAT_field', 'LONG_field'))
-                              # b.samps.sta<-b.samps.sta[c('Sample', 'STATION_KEY','MLocID', 'Date', 'long', 'lat','temp_Cx10', 'precip_mm', 
+                              # b.samps.sta<-b.samps.sta[c('Sample','MLocID', 'Date', 'long', 'lat','temp_Cx10', 'precip_mm', 
                               #                            'Eco2', 'Eco3', 'ELEV_m', 'W_E')]                       
                               #  colnames(b.samps.sta)
 
@@ -267,9 +265,9 @@ preds.wccp<-subset(b.samps.sta, Eco2=='WC' | Eco3==10)
 
 
 
-mwcf.b.p<-merge(bugs.MWCF, preds.mwcf, by=c('Sample', 'STATION_KEY', 'Eco2', 'Eco3'), suffix=c("", ".y")) 
+mwcf.b.p<-merge(bugs.MWCF, preds.mwcf, by=c('Sample', 'MLocID', 'Eco2', 'Eco3'), suffix=c("", ".y")) 
 
-wccp.b.p<-merge(bugs.WCCP, preds.wccp, by=c('Sample', 'STATION_KEY', 'Eco2', 'Eco3'), suffix=c("", ".y")) 
+wccp.b.p<-merge(bugs.WCCP, preds.wccp, by=c('Sample', 'MLocID', 'Eco2', 'Eco3'), suffix=c("", ".y")) 
 
 
 #carve out bug and predictor data into FINAL input data.frames
@@ -282,12 +280,12 @@ wccp.b.p<-merge(bugs.WCCP, preds.wccp, by=c('Sample', 'STATION_KEY', 'Eco2', 'Ec
 @@@@@@@  That way it is pulling from the most up to date version.
   
   colnames(mwcf.b.p)
-bugs.MWCF.F<-as.data.frame(mwcf.b.p[,c(1:296)])
-preds.mwcf.F<-as.data.frame(mwcf.b.p[,c(1,297:307)])
+bugs.MWCF.F<-as.data.frame(mwcf.b.p[,c(1:295)])
+preds.mwcf.F<-as.data.frame(mwcf.b.p[,c(1,296:307)])
 
 colnames(wccp.b.p)
-bugs.WCCP.F<-as.data.frame(wccp.b.p[,c(1:296)])
-preds.wccp.F<-as.data.frame(wccp.b.p[,c(1,297:307)])
+bugs.WCCP.F<-as.data.frame(wccp.b.p[,c(1:295)])
+preds.wccp.F<-as.data.frame(wccp.b.p[,c(1,296:307)])
 
 
 #verify dimensions are same for each input file
@@ -443,7 +441,13 @@ assess.all_MWCF<- assess.all.samples.1.0(result.prd=OE.assess.test, bugnew=bugs.
 @@@@
 @@@@@@@@@ Need to pull in from GitHub: https://github.com/leppott/BCGcalc.git
 @@@@
+
+  if(!require(remotes)){install.packages("remotes")}  #install if needed
+install_github("leppott/BCGcalc", force=TRUE, build_vignettes=TRUE)  
   
+  
+  
+    
 library(BCGcalc)
 bcg.taxa<-TaxaMaster_Ben_BCG_PacNW
 
@@ -455,7 +459,7 @@ assess.all_MWCF <- merge(assess.all_MWCF, bcg.taxa, by.x=c('Taxon'), by.y=c('Tax
 assess.all_MWCF <- arrange(assess.all_MWCF, Sample)
 
 
-assess.all_MWCF<-assess.all_MWCF[,c("Sample", "STATION_KEY", "Eco2", "Eco3", "Taxon", "observed", "Predicted", "Big.diff", "In.OtoE", "Class",            
+assess.all_MWCF<-assess.all_MWCF[,c("Sample", "MLocID", "Eco2", "Eco3", "Taxon", "observed", "Predicted", "Big.diff", "In.OtoE", "Class",            
                                     "BCG_Attr", "NonTarget", "Thermal_Indicator", "Long_Lived", "FFG", "Habit", "Life_Cycle")]
 
 assess.all_MWCF<- arrange(assess.all_MWCF, Sample, desc(Class), BCG_Attr)
@@ -463,11 +467,11 @@ assess.all_MWCF<- arrange(assess.all_MWCF, Sample, desc(Class), BCG_Attr)
 
 
 ## Write  tables of O/E outputs
-write.csv( OE.assess.test$OE.scores, "//deqlab1/biomon/R Stats/Bio Tools_Upgrade with R/MWFC_OEscores.csv", row.names=TRUE)
-write.csv( OE.assess.test$Group.Occurrence.Probs, "//deqlab1/biomon/R Stats/Bio Tools_Upgrade with R/MWFC_grp.probs.csv", row.names=TRUE)
-write.csv( OE.assess.test$Capture.Probs, "//deqlab1/biomon/R Stats/Bio Tools_Upgrade with R/MWFC_capt.probs.csv", row.names=TRUE)
+write.csv( OE.assess.test$OE.scores, "//deqlab1/biomon/R Stats/Bio Tools_Upgrade with R/MWFC_OEscores_4.29.21.csv", row.names=TRUE)
+write.csv( OE.assess.test$Group.Occurrence.Probs, "//deqlab1/biomon/R Stats/Bio Tools_Upgrade with R/MWFC_grp.probs_4.29.21.csv", row.names=TRUE)
+write.csv( OE.assess.test$Capture.Probs, "//deqlab1/biomon/R Stats/Bio Tools_Upgrade with R/MWFC_capt.probs_4.29.21.csv", row.names=TRUE)
 
-write.csv(assess.all_MWCF, 'assess.all_MWCF.csv')
+write.csv(assess.all_MWCF, 'assess.all_MWCF_4.29.21.csv')
 
 
 
@@ -479,7 +483,7 @@ write.csv(assess.all_MWCF, 'assess.all_MWCF.csv')
 #############
 
 # need to remove MWCF objects, or WCCP predictions will be made on MWCF model data
-rm(bugcal.pa,grps.final,preds.final, grpmns,covpinv) 
+rm(bugcal.pa, grps.final, preds.final, grpmns,covpinv) 
 
 # bring in WCCP model
 load('bugs analyses/PREDATOR/Nov05model_WCCP_16jan13.Rdata');    
@@ -540,7 +544,7 @@ assess.all_WCCP <- merge(assess.all_WCCP, bcg.taxa, by.x=c('Taxon'), by.y=c('Tax
 assess.all_WCCP <- arrange(assess.all_WCCP, Sample)
 
 
-assess.all_WCCP<-assess.all_WCCP[,c("Sample", "STATION_KEY", "Eco2", "Eco3", "Taxon", "observed", "Predicted", "Big.diff", "In.OtoE", "Class",            
+assess.all_WCCP<-assess.all_WCCP[,c("Sample", "MLocID", "Eco2", "Eco3", "Taxon", "observed", "Predicted", "Big.diff", "In.OtoE", "Class",            
                                     "BCG_Attr", "NonTarget", "Thermal_Indicator", "Long_Lived", "FFG", "Habit", "Life_Cycle")]
 
 assess.all_WCCP<- arrange(assess.all_WCCP, Sample, desc(Class), BCG_Attr)
@@ -549,11 +553,11 @@ assess.all_WCCP<- arrange(assess.all_WCCP, Sample, desc(Class), BCG_Attr)
 
 
 ## Write  tables of O/E outputs
-write.csv( OE.assess.test$OE.scores, "//deqlab1/biomon/R Stats/Bio Tools_Upgrade with R/WCCP_OEscores.csv", row.names=TRUE)
-write.csv( OE.assess.test$Group.Occurrence.Probs, "//deqlab1/biomon/R Stats/Bio Tools_Upgrade with R/WCCP_grp.probs.csv", row.names=TRUE)
-write.csv( OE.assess.test$Capture.Probs, "//deqlab1/biomon/R Stats/Bio Tools_Upgrade with R/WCCP_capt.probs.csv", row.names=TRUE)
+write.csv( OE.assess.test$OE.scores, "//deqlab1/biomon/R Stats/Bio Tools_Upgrade with R/WCCP_OEscores_4.29.21.csv", row.names=TRUE)
+write.csv( OE.assess.test$Group.Occurrence.Probs, "//deqlab1/biomon/R Stats/Bio Tools_Upgrade with R/WCCP_grp.probs_4.29.21.csv", row.names=TRUE)
+write.csv( OE.assess.test$Capture.Probs, "//deqlab1/biomon/R Stats/Bio Tools_Upgrade with R/WCCP_capt.probs_4.29.21.csv", row.names=TRUE)
 
-write.csv(assess.all_WCCP, 'assess.all_WCCP.csv')
+write.csv(assess.all_WCCP, 'assess.all_WCCP_4.29.21.csv')
 
 
 
@@ -582,7 +586,7 @@ write.csv(assess.all_WCCP, 'assess.all_WCCP.csv')
 null.taxa.NBR<-list("Baetis", "Chironominae", "Optioservus", "Orthocladiinae", "Rhyacophila", "Trombidiformes", "Diphetor_hageni",
                     "Epeorus", "Zaitzevia", "Brachycentrus")
 
-bugs.NBR.melt<- melt(bugs.NBR, id.vars=c('Sample', 'STATION_KEY','Eco2', 'Eco3'), variable.name = "Taxon", value.name = "Count")
+bugs.NBR.melt<- melt(bugs.NBR, id.vars=c('Sample', 'MLocID','Eco2', 'Eco3'), variable.name = "Taxon", value.name = "Count")
 #setnames(bugs.NBR.melt, old=c('variable', 'value'), new=c('Taxon', 'Count'))
 bugs.NBR.melt<-arrange(bugs.NBR.melt, Sample)
 bugs.NBR.melt.null.taxa<-bugs.NBR.melt[bugs.NBR.melt$Taxon %in% null.taxa.NBR & bugs.NBR.melt$Count > 0 , ] # cut down to only include null taxa > 0
