@@ -55,7 +55,6 @@ bugs.density <- bugs.lim[bugs.lim$Result_Unit == '#/ft2',]
 
 #########
 
-
 # calculate and add total abundance
 sample.info <- bugs.count %>%
       group_by(act_id, MLocID, StationDes, Project1, SampleStart_Date, Sample_Method, 
@@ -135,7 +134,7 @@ setnames(stations, old=c('station_key', 'Lat_DD', 'Long_DD', 'Predator_WorE', 'E
 
 
 stations<-stations %>%
-  select(MLocID, StationDes, lat, long, Eco2, Eco3, EcoRegion4, ELEV_m, precip_mm, temp_Cx10, 
+  select(MLocID, lat, long, Eco2, Eco3, EcoRegion4, ELEV_m, precip_mm, temp_Cx10, 
          W_E, HUC6_Name, HUC8_Name, HUC10_Name, HUC12_Name, Wade_Boat, COMID)
 
 library(plyr)
@@ -160,7 +159,13 @@ setnames(b_t_s, old=c('Result_Numeric','act_id', 'SampleStart_Date', 'Sample_Met
 
 
 
-                                            
+# run bug metrics function
+source('bugs analyses/metrics/bug metrics.R')
+bug.metrics(b_t_s)
+
+# run PREDATOR function
+source('bugs analyses/PREDATOR/PREDATOR models.R')
+bug.PREDATOR(b_t_s)
                                             
                                             
                                             #######################

@@ -10,10 +10,12 @@
 
 # optimally, this would be turned into a function, to roll through all samples at once
 
+bug.metrics <- function(b_t_s){
+
 library(reshape)
 library(plyr)
-
-
+library(data.table)
+library(tidyverse)
 
 
 
@@ -254,9 +256,6 @@ pct_Dom<- merge(pct_Dom, pct_Dom.1)
 ###
 ##
 
-@@
-@@@@@  Need to double check SH.div -- not working for single sample on Lady Cr.
-@@
 
 
 SH.div<-ddply(.data=rel.abund.unique, .(Sample), plyr::summarize, Shannon_diversity= -(sum(rel.abund.unique*log(rel.abund.unique))))
@@ -266,11 +265,6 @@ summary(Simp.div)
 
 # Evenness
 
-
-@@
-  @@@@@  Need to double check SH.div -- not working for single sample on Lady Cr.
-@@
-  
 
 
 even<-merge(SH.div, total.richness)
@@ -326,8 +320,7 @@ metrics<-merge(list.of.data.frames[1], list.of.data.frames[2], by='Sample', all.
 
 for(i in 3:length(list.of.data.frames)){
   metrics <- merge(metrics, list.of.data.frames[i], by='Sample', all.x = TRUE)
-  
+  }
+
 }
-
-
 

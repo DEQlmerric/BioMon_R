@@ -7,7 +7,12 @@
       # 1) Data formating for input files
       # 2) Run PREDATOR models: MWCF, WCCP
       # 3) Run NBR null model
-  
+#metrics function
+
+      
+
+bug.PREDATOR <- function(b_t_s){
+
 
 library(devtools)
 library(dplyr)
@@ -48,7 +53,8 @@ b.oe<-aggregate(b_t_s$Count,  list(Sample=b_t_s$Sample, OTU=b_t_s$OTU_RIV05_Nov0
                                  Eco2=b_t_s$Eco2, Eco3=b_t_s$Eco3), sum )# For each OTU in a Sample, sum the Counts
 
 colnames(b.oe)
-b.oe<-rename(b.oe, c("Count"="x")) 
+#b.oe<-rename(b.oe, c("Count"="x")) ---> doesn't work....? why? I didn't change it before now and worked fine?
+setnames(b.oe, old=c('x'), new=c('Count'))
 head(b.oe)
 b.oe<-arrange(b.oe, Sample)               # sort the d.f by Sample
 b.oe<-subset(b.oe, OTU != 666)      # remove '666' from d.f (they are ambiguous taxa not used in models)
@@ -145,11 +151,6 @@ summary(bugs.WCCP$Eco2)  # Mostly you will see 'WC', but LEVEL3 Eco 10 (Col. Pla
 
 
 
-@@@@@
-  @@@@@@  Next section is a way to check the code.  Finalize the code, then comment this out so
-it doesnt show up in outputs when running through functions
-@@@@@
-  
   
             # confirm that in the WCCP file, all records with Eco2 = 'WIBR', are located in Eco3 = '10' (Columbia Plateau)
             check.wccp.wibr<-ifelse(bugs.WCCP$Eco2=='WC', 'OK', 
@@ -227,12 +228,6 @@ preds.wccp<-subset(b.samps.sta, Eco2=='WC' | Eco3==10)
 
                 
 
-
-@@@@@
-  @@@@@@  Next section is a way to check the code.  Finalize the code, then comment this out so
-          it doesnt show up in outputs when running through functions
-@@@@@
-  
   
 
                 # #check for duplicate Samples in each file
@@ -249,21 +244,10 @@ preds.wccp<-subset(b.samps.sta, Eco2=='WC' | Eco3==10)
 
 
 # total # of observations in predictors may not match bugs.....merge tables so only matched remain
-
-                @@@@@
-                  @@@@@@  Next section is a way to check the code.  Finalize the code, then comment this out so
-                it doesnt show up in outputs when running through functions
-                @@@@@
-                  
-                  
-                
+              
                 dim(bugs.MWCF); dim(preds.mwcf)
                 dim(bugs.WCCP); dim(preds.wccp)
                 
-
-@@@@@@@@@@@@@
-
-
 
 mwcf.b.p<-merge(bugs.MWCF, preds.mwcf, by=c('Sample', 'MLocID', 'Eco2', 'Eco3'), suffix=c("", ".y")) 
 
@@ -271,14 +255,7 @@ wccp.b.p<-merge(bugs.WCCP, preds.wccp, by=c('Sample', 'MLocID', 'Eco2', 'Eco3'),
 
 
 #carve out bug and predictor data into FINAL input data.frames
-@@@@ 
-  @@@@@@ would be best to use a list of taxa and call out other columns by name specifically @@@@@
-  @@@@@@ but could be messy as new taxa are added into the OTU list...but I guess that requires changing column numbs too...
-@@@@
-  
-@@@@@@@  Is it possible to create a list of possible OTUs found in the Taxonomy table download?  
-@@@@@@@  That way it is pulling from the most up to date version.
-  
+
   colnames(mwcf.b.p)
 bugs.MWCF.F<-as.data.frame(mwcf.b.p[,c(1:295)])
 preds.mwcf.F<-as.data.frame(mwcf.b.p[,c(1,296:307)])
@@ -289,18 +266,7 @@ preds.wccp.F<-as.data.frame(wccp.b.p[,c(1,296:307)])
 
 
 #verify dimensions are same for each input file
-
-
-@@@@@
-  @@@@@@  Next section is a way to check the code.  Finalize the code, then comment this out so
-it doesnt show up in outputs when running through functions
-@@@@@
-  
-  
-
-
-
-              
+         
               dim(bugs.MWCF.F); dim(preds.mwcf.F) 
               dim(bugs.WCCP.F); dim(preds.wccp.F)
 
@@ -315,7 +281,6 @@ row.names(preds.wccp.F)<-preds.wccp.F$Sample
 
 ##  Align bug and predictor data, by site/sample;
 
-          @@@@@@ remove after verify code works properly?
           row.names(bugs.MWCF.F)==row.names(preds.mwcf.F);#check sample(row) alignment of bug and predictor data;
 
 
@@ -324,7 +289,6 @@ row.names(preds.wccp.F)<-preds.wccp.F$Sample
 bugs.MWCF.F<-bugs.MWCF.F[row.names(preds.mwcf.F),];#samples are not aligned. Fix by aligning bugs data to predictor data, since latter is sorted by sample type;
 
 
-          @@@@@@ remove after verify code works properly?
           
           row.names(bugs.MWCF.F)==row.names(preds.mwcf.F);#check alignment again -- alignment OK;
 
@@ -419,9 +383,6 @@ oe.mwcf$oe.cond<-(ifelse(oe.mwcf$OoverE <= 0.85, 'Most disturbed',
 
 
 
-@@@@ 
-  @@@@@ Check.  Comment out when final. 
-@@@@
 # calculate min - max for each condition class
 ddply(oe.mwcf, .(oe.cond), plyr::summarize, min = min(OoverE), max = max(OoverE))
 # verify that results are consistent with PREDATOR documentation benchmarks: <=0.85, 0.86 - 0.91, 0.92 - 1.24, > 1.24
@@ -436,35 +397,35 @@ source('bugs analyses/PREDATOR/assess.all.samples.v4.1_2.r')
 assess.all_MWCF<- assess.all.samples.1.0(result.prd=OE.assess.test, bugnew=bugs.MWCF.F, Pc=0.5)
 
 
-# bring in BCG attributes for each taxon, merge with assess df
-
-@@@@
-@@@@@@@@@ Need to pull in from GitHub: https://github.com/leppott/BCGcalc.git
-@@@@
-
-  if(!require(remotes)){install.packages("remotes")}  #install if needed
-install_github("leppott/BCGcalc", force=TRUE, build_vignettes=TRUE)  
-  
-  
-  
-    
-library(BCGcalc)
-bcg.taxa<-TaxaMaster_Ben_BCG_PacNW
-
-bcg.taxa<-bcg.taxa %>%
-  select(-c(Phylum, SubPhylum, Class, SubClass, Order, Family, Tribe, Genus, SubGenus, Species))
-
-assess.all_MWCF <- merge(assess.all_MWCF, bcg.taxa, by.x=c('Taxon'), by.y=c('TaxaID'), all.x=TRUE )            
-
-assess.all_MWCF <- arrange(assess.all_MWCF, Sample)
-
-
-assess.all_MWCF<-assess.all_MWCF[,c("Sample", "MLocID", "Eco2", "Eco3", "Taxon", "observed", "Predicted", "Big.diff", "In.OtoE", "Class",            
-                                    "BCG_Attr", "NonTarget", "Thermal_Indicator", "Long_Lived", "FFG", "Habit", "Life_Cycle")]
-
-assess.all_MWCF<- arrange(assess.all_MWCF, Sample, desc(Class), BCG_Attr)
-
-
+#' # bring in BCG attributes for each taxon, merge with assess df
+#' 
+#' @@@@
+#' @@@@@@@@@ Need to pull in from GitHub: https://github.com/leppott/BCGcalc.git
+#' @@@@
+#' 
+#'   if(!require(remotes)){install.packages("remotes")}  #install if needed
+#' install_github("leppott/BCGcalc", force=TRUE, build_vignettes=TRUE)  
+#'   
+#'   
+#'   
+#'     
+#' library(BCGcalc)
+#' bcg.taxa<-TaxaMaster_Ben_BCG_PacNW
+#' 
+#' bcg.taxa<-bcg.taxa %>%
+#'   select(-c(Phylum, SubPhylum, Class, SubClass, Order, Family, Tribe, Genus, SubGenus, Species))
+#' 
+#' assess.all_MWCF <- merge(assess.all_MWCF, bcg.taxa, by.x=c('Taxon'), by.y=c('TaxaID'), all.x=TRUE )            
+#' 
+#' assess.all_MWCF <- arrange(assess.all_MWCF, Sample)
+#' 
+#' 
+#' assess.all_MWCF<-assess.all_MWCF[,c("Sample", "MLocID", "Eco2", "Eco3", "Taxon", "observed", "Predicted", "Big.diff", "In.OtoE", "Class",            
+#'                                     "BCG_Attr", "NonTarget", "Thermal_Indicator", "Long_Lived", "FFG", "Habit", "Life_Cycle")]
+#' 
+#' assess.all_MWCF<- arrange(assess.all_MWCF, Sample, desc(Class), BCG_Attr)
+#' 
+#' 
 
 ## Write  tables of O/E outputs
 write.csv( OE.assess.test$OE.scores, "//deqlab1/biomon/R Stats/Bio Tools_Upgrade with R/MWFC_OEscores_4.29.21.csv", row.names=TRUE)
@@ -494,10 +455,6 @@ load('bugs analyses/PREDATOR/Nov05model_WCCP_16jan13.Rdata');
 
 preds.wccp.F<-preds.wccp.F[complete.cases(preds.wccp.F[,preds.final]),]
 bugs.WCCP.F<-bugs.WCCP.F[row.names(preds.wccp.F),]
-            
-@@@@@
-                  dim(preds.wccp.F); dim(bugs.WCCP.F)   
-@@@@@
 
 #make predictions for test data;
 OE.assess.test<-model.predict.v4.1(bugcal.pa,grps.final,preds.final, grpmns,covpinv,
@@ -505,12 +462,12 @@ OE.assess.test<-model.predict.v4.1(bugcal.pa,grps.final,preds.final, grpmns,covp
 
 oe.wccp<-OE.assess.test$OE.scores # create a d.f of OE.scores
 
-@@@@@
+
             head(oe.wccp)# look at O/E scores, for all samples;
             
             head(OE.assess.test$Group.Occurrence.Probs)#Look at the predicted group membership probabilities;
             head(OE.assess.test$Capture.Probs)#Look at the predicted probabilties for each taxon at each site;
-@@@@@
+
               
 # Assign PREDATOR condition classes == WCCP benchmarks
 oe.wccp$OoverE<-round(oe.wccp$OoverE, 2)
@@ -519,11 +476,11 @@ oe.wccp$oe.cond<-(ifelse(oe.wccp$OoverE <= 0.78, 'Most disturbed',
                                 ifelse(oe.wccp$OoverE >= 0.93 & oe.wccp$OoverE < 1.24, 'Least disturbed', 
                                        ifelse(oe.wccp$OoverE >= 1.24, 'Enriched', -999)))))
 
-@@@@
+
             # calculate min - max for each condition class
             ddply(oe.wccp, .(oe.cond), summarize, min = min(OoverE), max = max(OoverE))
             # verify that results are consistent with PREDATOR documentation benchmarks: <=0.78, 0.79 - 0.92, 0.93 - 1.23, > 1.23
-@@@@
+
 
 # assess all samples: 
 
@@ -533,22 +490,22 @@ assess.all_WCCP<- assess.all.samples.1.0(result.prd=OE.assess.test, bugnew=bugs.
 
 
 # bring in BCG attributes for each taxon, merge with assess df
-library(BCGcalc)
-bcg.taxa<-TaxaMaster_Ben_BCG_PacNW
-
-bcg.taxa<-bcg.taxa %>%
-  select(-c(Phylum, SubPhylum, Class, SubClass, Order, Family, Tribe, Genus, SubGenus, Species))
-
-assess.all_WCCP <- merge(assess.all_WCCP, bcg.taxa, by.x=c('Taxon'), by.y=c('TaxaID'), all.x=TRUE )            
-
-assess.all_WCCP <- arrange(assess.all_WCCP, Sample)
-
-
-assess.all_WCCP<-assess.all_WCCP[,c("Sample", "MLocID", "Eco2", "Eco3", "Taxon", "observed", "Predicted", "Big.diff", "In.OtoE", "Class",            
-                                    "BCG_Attr", "NonTarget", "Thermal_Indicator", "Long_Lived", "FFG", "Habit", "Life_Cycle")]
-
-assess.all_WCCP<- arrange(assess.all_WCCP, Sample, desc(Class), BCG_Attr)
-
+# library(BCGcalc)
+# bcg.taxa<-TaxaMaster_Ben_BCG_PacNW
+# 
+# bcg.taxa<-bcg.taxa %>%
+#   select(-c(Phylum, SubPhylum, Class, SubClass, Order, Family, Tribe, Genus, SubGenus, Species))
+# 
+# assess.all_WCCP <- merge(assess.all_WCCP, bcg.taxa, by.x=c('Taxon'), by.y=c('TaxaID'), all.x=TRUE )            
+# 
+# assess.all_WCCP <- arrange(assess.all_WCCP, Sample)
+# 
+# 
+# assess.all_WCCP<-assess.all_WCCP[,c("Sample", "MLocID", "Eco2", "Eco3", "Taxon", "observed", "Predicted", "Big.diff", "In.OtoE", "Class",            
+#                                     "BCG_Attr", "NonTarget", "Thermal_Indicator", "Long_Lived", "FFG", "Habit", "Life_Cycle")]
+# 
+# assess.all_WCCP<- arrange(assess.all_WCCP, Sample, desc(Class), BCG_Attr)
+# 
 
 
 
@@ -587,7 +544,7 @@ null.taxa.NBR<-list("Baetis", "Chironominae", "Optioservus", "Orthocladiinae", "
                     "Epeorus", "Zaitzevia", "Brachycentrus")
 
 bugs.NBR.melt<- melt(bugs.NBR, id.vars=c('Sample', 'MLocID','Eco2', 'Eco3'), variable.name = "Taxon", value.name = "Count")
-#setnames(bugs.NBR.melt, old=c('variable', 'value'), new=c('Taxon', 'Count'))
+setnames(bugs.NBR.melt, old=c('variable', 'value'), new=c('Taxon', 'Count'))
 bugs.NBR.melt<-arrange(bugs.NBR.melt, Sample)
 bugs.NBR.melt.null.taxa<-bugs.NBR.melt[bugs.NBR.melt$Taxon %in% null.taxa.NBR & bugs.NBR.melt$Count > 0 , ] # cut down to only include null taxa > 0
 bugs.NBR.melt.null.taxa$Taxon<-droplevels(bugs.NBR.melt.null.taxa$Taxon)
@@ -605,5 +562,5 @@ oe.nbr$oe.cond<-(ifelse(oe.nbr$OoverE.null <= 0.50, 'Most disturbed',
                                       ifelse(oe.nbr$OoverE.null >= 1.31, 'Enriched', -999)))))
 
 
-
+}
 
