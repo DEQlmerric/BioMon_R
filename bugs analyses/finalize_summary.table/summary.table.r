@@ -68,9 +68,8 @@ colnames(b.samps)
 
 
 
-oe.stress.mets<-merge(oe.stress.mets, b.samps, by='Sample', all.x=TRUE, suffix=c('','.y'))  # 
-oe.stress.mets<-oe.stress.mets %>%
-  select(-STATION_KEY.y)
+oe.stress.mets<-merge(oe.stress.mets, b.samps.sta, by='Sample', all.x=TRUE, suffix=c('','.y'))  # 
+
 
 colnames(oe.stress.mets)
 

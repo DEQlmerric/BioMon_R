@@ -10,23 +10,23 @@ library(reshape2)
 require(tidyverse)
 library(readxl)
 # bring in data
-alt.usu <- read_excel('//deqlab1/GIS_WA/Project_Working_Folders/Reference/2020/GE Screens/USU_all/GE_USU Ref_Screen_ALT.xlsx',
+alt.usu <- read_excel('//deqlab1/GIS_WA/Project_Working_Folders/Reference/2020/GE_Screens/USU_all/GE_USU Ref_Screen_ALT.xlsx',
                       sheet='USU_ALT_2020')
-alt.usu_qc <- read_excel('//deqlab1/GIS_WA/Project_Working_Folders/Reference/2020/GE Screens/USU_all/GE_USU Ref_Screen_ALT.xlsx',
+alt.usu_qc <- read_excel('//deqlab1/GIS_WA/Project_Working_Folders/Reference/2020/GE_Screens/USU_all/GE_USU Ref_Screen_ALT.xlsx',
                       sheet='USU_ALL_2020')
 
 
 
-mbs.usu <- read_excel('//deqlab1/GIS_WA/Project_Working_Folders/Reference/2020/GE Screens/USU_all/GE_USU_REF_Screen_MBS_FIXED.xlsx',
+mbs.usu <- read_excel('//deqlab1/GIS_WA/Project_Working_Folders/Reference/2020/GE_Screens/USU_all/GE_USU_REF_Screen_MBS_FIXED.xlsx',
                       sheet='USU_MBS_2020')
-mbs.usu_qc <- read_excel('//deqlab1/GIS_WA/Project_Working_Folders/Reference/2020/GE Screens/USU_all/GE_USU_REF_Screen_MBS_FIXED.xlsx',
+mbs.usu_qc <- read_excel('//deqlab1/GIS_WA/Project_Working_Folders/Reference/2020/GE_Screens/USU_all/GE_USU_REF_Screen_MBS_FIXED.xlsx',
                          sheet='USU_ALL_2020')
 
 
 
-slh.usu <- read_excel('//deqlab1/GIS_WA/Project_Working_Folders/Reference/2020/GE Screens/USU_all/GE_USU_Ref_Screen_SLH.xlsx',
+slh.usu <- read_excel('//deqlab1/GIS_WA/Project_Working_Folders/Reference/2020/GE_Screens/USU_all/GE_USU_Ref_Screen_SLH.xlsx',
                       sheet='USU_SLH_2020')
-slh.usu_qc <- read_excel('//deqlab1/GIS_WA/Project_Working_Folders/Reference/2020/GE Screens/USU_all/GE_USU_Ref_Screen_SLH.xlsx',
+slh.usu_qc <- read_excel('//deqlab1/GIS_WA/Project_Working_Folders/Reference/2020/GE_Screens/USU_all/GE_USU_Ref_Screen_SLH.xlsx',
                          sheet='USU_ALL_2020')
 
 
@@ -188,7 +188,7 @@ bpj_n_below<-subset(GE_Site_sum.scores, Scorer_BPJ=="N" & Disturb.score < 15)
 bpj_question<-subset(GE_Site_sum.scores, Scorer_BPJ=="?"  | Scorer_BPJ == "N?")
 
           bpj.checks.usu <-rbind(bpj_n_below, bpj_question)
-          write.csv(bpj.checks.usu, '//deqlab1/GIS_WA/Project_Working_Folders/Reference/2020/GE Screens/USU_all/bpj.checks.usu.csv')
+          write.csv(bpj.checks.usu, '//deqlab1/GIS_WA/Project_Working_Folders/Reference/2020/GE_Screens/USU_all/bpj.checks.usu.csv')
 
           
 #########
@@ -229,7 +229,7 @@ GE_Site_sum.scores_ave <- GE_Site_sum.scores %>%
 
 
 # combine single disturb scores per station, with final BPJ status
-bpj.final <- read.csv('//deqlab1/GIS_WA/Project_Working_Folders/Reference/2020/GE Screens/USU_all/FINAL_BPJ_2021_USU.csv')
+bpj.final <- read.csv('//deqlab1/GIS_WA/Project_Working_Folders/Reference/2020/GE_Screens/USU_all/FINAL_BPJ_2021_USU.csv')
 
 bpj.final <- bpj.final%>%
   select(Agency_ID, BPJ_final)
@@ -289,7 +289,7 @@ colnames(GE_Site_sum.scores_ave_bpj)[which(names(GE_Site_sum.scores_ave_bpj) == 
 
 
 # still missing site level info, merge back with GIS data file
-gis.usu <- read_excel('//deqlab1/GIS_WA/Project_Working_Folders/Reference/2020/GE Screens/USU_all/USU_Ref_Screen.xlsx',
+gis.usu <- read_excel('//deqlab1/GIS_WA/Project_Working_Folders/Reference/2020/GE_Screens/USU_all/USU_Ref_Screen.xlsx',
                       sheet='ref_screen')
 
 gis.usu <- gis.usu %>%

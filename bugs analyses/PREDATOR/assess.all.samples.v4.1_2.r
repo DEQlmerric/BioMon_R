@@ -86,7 +86,7 @@ Capture.Probs_long <- as.data.frame(result.prd$Capture.Probs) %>%
 
 bugs_long <- bugnew %>%
   dplyr::mutate(sampleID = row.names(bugnew)) %>% # SLH = replaced specific call to 'bugs.MWCF.F' to general 'bugnew'
-  tidyr::gather(key = "Taxon", value = "observed", -Sample, -STATION_KEY, -Eco2, -Eco3, -sampleID)
+  tidyr::gather(key = "Taxon", value = "observed", -Sample, -MLocID, -Eco2, -Eco3, -sampleID)
 
 
 

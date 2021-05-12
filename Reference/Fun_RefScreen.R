@@ -18,8 +18,8 @@ odbcClose(sta.sql)
 
 # 2020 thresholds - variable thresholds based on metric - thresholds generated from 'Screening_Thresholds.R'
 ref_screen <-  gis_mets %>% 
-  left_join(stations, by = c('MLocId'= 'MLocID')) %>% # we need to add org to gis_mets , 'OrgID' = 'OrgID') 
-  select(OrgID,MLocId,StationDes,Lat_DD, Long_DD, HUC8_Name,HUC12_Name,GNIS_Name,EcoRegion2,EcoRegion3,EcoRegion4,COMID,
+  left_join(stations, by = c('MLocID')) %>% # we need to add org to gis_mets , 'OrgID' = 'OrgID') 
+  select(OrgID,MLocID,StationDes,Lat_DD, Long_DD, HUC8_Name,HUC12_Name,GNIS_Name,EcoRegion2,EcoRegion3,EcoRegion4,COMID,
          rdden_km_km2,xings_km2,P_AgLand,P_Urban21Land,mines,grvl_mn_km2,P_canal) %>% 
   mutate(rd_Status = case_when(rdden_km_km2 <= 1.1854942 ~ 1,   # 25th
                                rdden_km_km2 >= 4.9079551 ~ 2, # 95th

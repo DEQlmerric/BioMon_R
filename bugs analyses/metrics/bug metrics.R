@@ -31,14 +31,7 @@ rel.abund<-ddply(.data = rel.abund, .(Sample, Taxon), plyr::summarize, rel.abund
 
 
 
-                                              # Travis' code for how to deal with this thru the dplyr way:
-                                              # rel.abund <- rel.abund %>%
-                                              #   group_by(Sample, Taxon) %>%
-                                              #   summarise(sum = sum(Count),
-                                              #             sum_abundance = first(total.abundance),
-                                              #             rel.abund.col = sum/sum_abundance)
-                                              # 
-                                              # 
+                                              
 
 # create a dataframe of relative abundances, but only for unique taxa -- used for Diversity/Evenness metrics
 b_t_s.unique<- subset(b_t_s, UniqueTaxon=='UniqueTaxon')

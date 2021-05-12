@@ -30,7 +30,13 @@ stress.bugs<-subset(stress.bugs, OTU_Stress05 != 666) # remove '666' from d.f (t
 
 #  
 # # 3.2 = export file for use in C2 to run Stressor ID models (TS and BSTI)
-write.csv(stress.bugs, '//deqlab1/biomon/R Stats/Bio Tools_Upgrade with R/stress.bugs.csv', row.names = FALSE )
+
+@@@
+  @@@   If not overwriting data each time--only calculating new samples, then would be best to add a date to file name.
+  @@@   If turning all of these into functions, maybe put a date call in the front end and grep(?) it into the file name?
+@@@
+
+write.csv(stress.bugs, '//deqlab1/biomon/R Stats/Bio Tools_Upgrade with R/stress.bugs_AWQMS_4.29.21.csv', row.names = FALSE )
 # 
 #       # Final format for export to 'C2' is Sample, OTU, Count 
 #       # there is no need to subsample for Stressor ID models
@@ -52,7 +58,7 @@ hist(tot.abund.STR$total.abundance.STR, breaks=100)
 # ####
 
 #change file name to most recent run from C2
-stress.scores<-read.csv('//deqlab1/biomon/R Stats/Bio Tools_Upgrade with R/Stressor Scores_all samples_11.26.19.csv')
+stress.scores<-read.csv('//deqlab1/biomon/R Stats/Bio Tools_Upgrade with R/Stressor Scores_all samples_4.29.21.csv')
 
 
 stress.scores<-rename(stress.scores, c("Code"="Sample")) #rename first column to 'Sample'
@@ -62,7 +68,6 @@ stress.scores$BSTI<- (sin((3.14159265358979*((10^stress.scores$BSTI_WA_Inv)-1)/2
 stress.scores$BSTI<- round(stress.scores$BSTI, 0) # Format BSTI to appropriate sig figs
 stress.scores <- subset(stress.scores, select = -c(BSTI_WA_Inv) ) # drop untransformed--call out by name, in case column order changes
 
-stress.scores[stress.scores$Sample =='12001MCB',] # 2387 12001MCB 20.3   12
 
 @@@@@@@@@@@@@@@@
   @@@@@@@@@@@@@@@@

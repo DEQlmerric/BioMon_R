@@ -9,12 +9,17 @@
 library(reshape2)
 require(tidyverse)
 
+
+
+
+
+
 # bring in data
-slh <- read.csv('//deqlab1/GIS_WA/Project_Working_Folders/Reference/2020/GE Screens/Screen results/2020 GE watershed screens_SLH.csv')
+slh <- read.csv('//deqlab1/GIS_WA/Project_Working_Folders/Reference/2020/GE_Screens/Screen results/2020 GE watershed screens_SLH.csv')
 slh$Agency_ID <- as.factor(slh$Agency_ID)
-mbs <- read.csv('//deqlab1/GIS_WA/Project_Working_Folders/Reference/2020/GE Screens/Screen results/GE_Ref_Screen_MBS_CAFW.FIXED.csv')
+mbs <- read.csv('//deqlab1/GIS_WA/Project_Working_Folders/Reference/2020/GE_Screens/Screen results/GE_Ref_Screen_MBS_CAFW.FIXED.csv')
 mbs$Agency_ID <- as.factor(mbs$Agency_ID)
-alt <- read.csv('//deqlab1/GIS_WA/Project_Working_Folders/Reference/2020/GE Screens/Screen results/Reference_screen_bydate_ALT_FIXED.csv')
+alt <- read.csv('//deqlab1/GIS_WA/Project_Working_Folders/Reference/2020/GE_Screens/Screen results/Reference_screen_bydate_ALT_FIXED.csv')
 alt$Agency_ID <- as.factor(alt$Agency_ID)
 
 # merge data frames together
@@ -218,7 +223,7 @@ GE_Site_sum.scores_ave <- GE_Site_sum.scores %>%
 ########
 
 # combine single disturb scores per station, with final BPJ status
-bpj.final <- read.csv('//deqlab1/GIS_WA/Project_Working_Folders/Reference/2020/GE Screens/Screen results/FINAL_BPJ_2021.csv')
+bpj.final <- read.csv('//deqlab1/GIS_WA/Project_Working_Folders/Reference/2020/GE_Screens/Screen results/FINAL_BPJ_2021.csv')
 
 bpj.final <- bpj.final%>%
   select(Agency_ID, BPJ_final)
