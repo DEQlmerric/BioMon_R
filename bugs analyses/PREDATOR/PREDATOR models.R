@@ -561,6 +561,6 @@ oe.nbr$oe.cond<-(ifelse(oe.nbr$OoverE.null <= 0.50, 'Most disturbed',
                                ifelse(oe.nbr$OoverE.null >= 0.75 & oe.nbr$OoverE.null < 1.31, 'Least disturbed', 
                                       ifelse(oe.nbr$OoverE.null >= 1.31, 'Enriched', -999)))))
 
-
+.GlobalEnv$res <- res
 }
 

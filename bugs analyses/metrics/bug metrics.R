@@ -321,6 +321,6 @@ metrics<-merge(list.of.data.frames[1], list.of.data.frames[2], by='Sample', all.
 for(i in 3:length(list.of.data.frames)){
   metrics <- merge(metrics, list.of.data.frames[i], by='Sample', all.x = TRUE)
   }
-
+.GlobalEnv$res <- res
 }
 
