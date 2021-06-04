@@ -11,7 +11,7 @@
 
  
 
-   
+data.raw.AWQMS <- function()   {
 
 
 
@@ -95,14 +95,6 @@ b_t <- bugs.count %>%
 
 
 
-
-
-
-
-
-
-
-
 ##############################
 
 
@@ -155,18 +147,18 @@ b_t_s <- b_t %>%
 setnames(b_t_s, old=c('Result_Numeric','act_id', 'SampleStart_Date', 'Sample_Method'), 
          new=c('Count','Sample', 'Date', 'Habitat'))
 
-    
+
+.GlobalEnv$b_t_s <- b_t_s    
+
+}
+
+ 
 
 
 
-# run bug metrics function
-source('bugs analyses/metrics/bug metrics.R')
-bug.metrics(b_t_s)
 
-# run PREDATOR function
-source('bugs analyses/PREDATOR/PREDATOR models.R')
-bug.PREDATOR(b_t_s)
-                                            
+#####
+ Below is code used to re-format data speecifically for USU BugLab needs...Wait to delete until after new O/E models finalized
                                             
                                             #######################
                                             

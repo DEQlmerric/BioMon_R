@@ -371,7 +371,7 @@ bug.PREDATOR <- function(b_t_s){
   
   oe.mwcf<-OE.assess.test$OE.scores; #create a d.f out of OE.scores
   
-  .GlobalEnv$oe.mwcf <- oe.mwcf
+ 
   
   head(OE.assess.test$OE.scores)# look at O/E scores, for all samples;
   
@@ -392,7 +392,7 @@ bug.PREDATOR <- function(b_t_s){
   # verify that results are consistent with PREDATOR documentation benchmarks: <=0.85, 0.86 - 0.91, 0.92 - 1.24, > 1.24
   # verify no '-999' values
   
-  
+  .GlobalEnv$oe.mwcf <- oe.mwcf
   
   # assess all samples: 
   
@@ -464,7 +464,7 @@ bug.PREDATOR <- function(b_t_s){
                                      prednew=preds.wccp.F,bugnew=bugs.WCCP.F,Pc=0.5);
   
   oe.wccp<-OE.assess.test$OE.scores # create a d.f of OE.scores
-  .GlobalEnv$oe.wccp <- oe.wccp
+ 
   
   head(oe.wccp)# look at O/E scores, for all samples;
   
@@ -483,7 +483,7 @@ bug.PREDATOR <- function(b_t_s){
   # calculate min - max for each condition class
   ddply(oe.wccp, .(oe.cond), summarize, min = min(OoverE), max = max(OoverE))
   # verify that results are consistent with PREDATOR documentation benchmarks: <=0.78, 0.79 - 0.92, 0.93 - 1.23, > 1.23
-  
+  .GlobalEnv$oe.wccp <- oe.wccp
   
   # assess all samples: 
   
