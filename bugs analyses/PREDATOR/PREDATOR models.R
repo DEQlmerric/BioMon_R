@@ -250,19 +250,20 @@ bug.PREDATOR <- function(b_t_s){
   
   
   mwcf.b.p<-merge(bugs.MWCF, preds.mwcf, by=c('Sample', 'MLocID', 'Eco2', 'Eco3'), suffix=c("", ".y")) 
+  mwcf.b.p <- select(mwcf.b.p, -Var.5)
   
   wccp.b.p<-merge(bugs.WCCP, preds.wccp, by=c('Sample', 'MLocID', 'Eco2', 'Eco3'), suffix=c("", ".y")) 
-  
+  wccp.b.p <- select(wccp.b.p, -Var.5)
   
   #carve out bug and predictor data into FINAL input data.frames
   
   colnames(mwcf.b.p)
-  bugs.MWCF.F<-as.data.frame(mwcf.b.p[,c(1:295)])
-  preds.mwcf.F<-as.data.frame(mwcf.b.p[,c(1,296:307)])
+  bugs.MWCF.F<-as.data.frame(mwcf.b.p[,c(1:296)])
+  preds.mwcf.F<-as.data.frame(mwcf.b.p[,c(1,297:308)])
   
   colnames(wccp.b.p)
-  bugs.WCCP.F<-as.data.frame(wccp.b.p[,c(1:295)])
-  preds.wccp.F<-as.data.frame(wccp.b.p[,c(1,296:307)])
+  bugs.WCCP.F<-as.data.frame(wccp.b.p[,c(1:296)])
+  preds.wccp.F<-as.data.frame(wccp.b.p[,c(1,297:308)])
   
   
   #verify dimensions are same for each input file
@@ -369,6 +370,9 @@ bug.PREDATOR <- function(b_t_s){
   
   
   oe.mwcf<-OE.assess.test$OE.scores; #create a d.f out of OE.scores
+  
+  .GlobalEnv$oe.mwcf <- oe.mwcf
+  
   head(OE.assess.test$OE.scores)# look at O/E scores, for all samples;
   
   head(OE.assess.test$Group.Occurrence.Probs) # Look at the predicted group membership probabilities;
@@ -428,12 +432,11 @@ bug.PREDATOR <- function(b_t_s){
   #' 
   
   ## Write  tables of O/E outputs
-  write.csv( OE.assess.test$OE.scores, "//deqlab1/biomon/R Stats/Bio Tools_Upgrade with R/MWFC_OEscores_4.29.21.csv", row.names=TRUE)
-  write.csv( OE.assess.test$Group.Occurrence.Probs, "//deqlab1/biomon/R Stats/Bio Tools_Upgrade with R/MWFC_grp.probs_4.29.21.csv", row.names=TRUE)
-  write.csv( OE.assess.test$Capture.Probs, "//deqlab1/biomon/R Stats/Bio Tools_Upgrade with R/MWFC_capt.probs_4.29.21.csv", row.names=TRUE)
+  write.csv(OE.assess.test$OE.scores, paste0("//deqlab1/biomon/R Stats/Bio Tools_Upgrade with R/MWFC_OEscores_",Sys.Date(), ".csv"), row.names=TRUE)
+  write.csv(OE.assess.test$Group.Occurrence.Probs, paste0("//deqlab1/biomon/R Stats/Bio Tools_Upgrade with R/MWFC_grp.probs_", Sys.Date(), ".csv"), row.names=TRUE)
+  write.csv(OE.assess.test$Capture.Probs, paste0("//deqlab1/biomon/R Stats/Bio Tools_Upgrade with R/MWFC_capt.probs_", Sys.Date(), ".csv"), row.names=TRUE)
   
-  write.csv(assess.all_MWCF, 'assess.all_MWCF_4.29.21.csv')
-  
+  write.csv(assess.all_MWCF, paste0('//deqlab1/biomon/R Stats/Bio Tools_Upgrade with R/assess.all_MWCF_', Sys.Date(), '.csv'), row.names=TRUE)
   
   
   
@@ -461,7 +464,7 @@ bug.PREDATOR <- function(b_t_s){
                                      prednew=preds.wccp.F,bugnew=bugs.WCCP.F,Pc=0.5);
   
   oe.wccp<-OE.assess.test$OE.scores # create a d.f of OE.scores
-  
+  .GlobalEnv$oe.wccp <- oe.wccp
   
   head(oe.wccp)# look at O/E scores, for all samples;
   
@@ -510,13 +513,18 @@ bug.PREDATOR <- function(b_t_s){
   
   
   ## Write  tables of O/E outputs
-  write.csv( OE.assess.test$OE.scores, "//deqlab1/biomon/R Stats/Bio Tools_Upgrade with R/WCCP_OEscores_4.29.21.csv", row.names=TRUE)
-  write.csv( OE.assess.test$Group.Occurrence.Probs, "//deqlab1/biomon/R Stats/Bio Tools_Upgrade with R/WCCP_grp.probs_4.29.21.csv", row.names=TRUE)
-  write.csv( OE.assess.test$Capture.Probs, "//deqlab1/biomon/R Stats/Bio Tools_Upgrade with R/WCCP_capt.probs_4.29.21.csv", row.names=TRUE)
+                  # write.csv( OE.assess.test$OE.scores, "//deqlab1/biomon/R Stats/Bio Tools_Upgrade with R/WCCP_OEscores_4.29.21.csv", row.names=TRUE)
+                  # write.csv( OE.assess.test$Group.Occurrence.Probs, "//deqlab1/biomon/R Stats/Bio Tools_Upgrade with R/WCCP_grp.probs_4.29.21.csv", row.names=TRUE)
+                  # write.csv( OE.assess.test$Capture.Probs, "//deqlab1/biomon/R Stats/Bio Tools_Upgrade with R/WCCP_capt.probs_4.29.21.csv", row.names=TRUE)
+                  # 
+                  # write.csv(assess.all_WCCP, 'assess.all_WCCP_4.29.21.csv')
+                  # 
   
-  write.csv(assess.all_WCCP, 'assess.all_WCCP_4.29.21.csv')
+  write.csv(OE.assess.test$OE.scores, paste0("//deqlab1/biomon/R Stats/Bio Tools_Upgrade with R/WCCP_OEscores_",Sys.Date(), ".csv"), row.names=TRUE)
+  write.csv(OE.assess.test$Group.Occurrence.Probs, paste0("//deqlab1/biomon/R Stats/Bio Tools_Upgrade with R/WCCP_grp.probs_", Sys.Date(), ".csv"), row.names=TRUE)
+  write.csv(OE.assess.test$Capture.Probs, paste0("//deqlab1/biomon/R Stats/Bio Tools_Upgrade with R/WCCP_capt.probs_", Sys.Date(), ".csv"), row.names=TRUE)
   
-  
+  write.csv(assess.all_WCCP, paste0('//deqlab1/biomon/R Stats/Bio Tools_Upgrade with R/assess.all_WCCP_', Sys.Date(), '.csv'), row.names=TRUE)
   
   
   
@@ -561,5 +569,5 @@ bug.PREDATOR <- function(b_t_s){
                                  ifelse(oe.nbr$OoverE.null >= 0.75 & oe.nbr$OoverE.null < 1.31, 'Least disturbed', 
                                         ifelse(oe.nbr$OoverE.null >= 1.31, 'Enriched', -999)))))
   
-  .GlobalEnv$res <- res
+  .GlobalEnv$oe.nbr <- oe.nbr
 }
