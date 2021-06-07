@@ -18,10 +18,10 @@
               
 
               
+@@@  PLACEHOLDER: Lesleys "missing summary" query           
               
               
-              
-# 
+# run data query from AWQMS
 source('bugs analyses/data/Data_from_AWQMS.R')
 data.raw.AWQMS()
               
