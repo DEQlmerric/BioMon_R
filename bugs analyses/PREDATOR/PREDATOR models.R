@@ -11,7 +11,7 @@
 
 
 
-bug.PREDATOR <- function(b_t_s){
+bug.PREDATOR <- function(b_t_s = b_t_s){
   
   
   library(devtools)
@@ -129,6 +129,7 @@ bug.PREDATOR <- function(b_t_s){
   
   
   dm.rare<- melt(b.rare.seed, measure.var = 'Count') 
+  setDT(dm.rare)
   bugs.all <- dcast(dm.rare, Sample+MLocID+Eco2+Eco3 ~ OTU, fun.aggregate = sum) # Sample x OTU doesn't seem to be unique so you need the fun.aggregate.  
   head(bugs.all)
   
@@ -250,10 +251,20 @@ bug.PREDATOR <- function(b_t_s){
   
   
   mwcf.b.p<-merge(bugs.MWCF, preds.mwcf, by=c('Sample', 'MLocID', 'Eco2', 'Eco3'), suffix=c("", ".y")) 
-  mwcf.b.p <- select(mwcf.b.p, -Var.5)
   
+  #When I ran this, Var.5 didn't exist and it errored here. Adding a condition to remove it if it exists
+  
+  if("Var.5" %in% names(mwcf.b.p)){
+  mwcf.b.p <- dplyr::select(mwcf.b.p, -Var.5)
+  }
   wccp.b.p<-merge(bugs.WCCP, preds.wccp, by=c('Sample', 'MLocID', 'Eco2', 'Eco3'), suffix=c("", ".y")) 
-  wccp.b.p <- select(wccp.b.p, -Var.5)
+  
+  #When I ran this, Var.5 didn't exist and it errored here. Adding a condition to remove it if it exists
+  
+  if("Var.5" %in% names(wccp.b.p)){
+    wccp.b.p <- dplyr::select(wccp.b.p, -Var.5)
+  }
+ 
   
   #carve out bug and predictor data into FINAL input data.frames
   
@@ -392,7 +403,7 @@ bug.PREDATOR <- function(b_t_s){
   # verify that results are consistent with PREDATOR documentation benchmarks: <=0.85, 0.86 - 0.91, 0.92 - 1.24, > 1.24
   # verify no '-999' values
   
-  .GlobalEnv$oe.mwcf <- oe.mwcf
+  #.GlobalEnv$oe.mwcf <- oe.mwcf
   
   # assess all samples: 
   
@@ -483,7 +494,7 @@ bug.PREDATOR <- function(b_t_s){
   # calculate min - max for each condition class
   ddply(oe.wccp, .(oe.cond), summarize, min = min(OoverE), max = max(OoverE))
   # verify that results are consistent with PREDATOR documentation benchmarks: <=0.78, 0.79 - 0.92, 0.93 - 1.23, > 1.23
-  .GlobalEnv$oe.wccp <- oe.wccp
+  #.GlobalEnv$oe.wccp <- oe.wccp
   
   # assess all samples: 
   
@@ -568,6 +579,11 @@ bug.PREDATOR <- function(b_t_s){
                           ifelse(oe.nbr$OoverE.null > 0.50 & oe.nbr$OoverE.null < 0.75, 'Moderately disturbed', 
                                  ifelse(oe.nbr$OoverE.null >= 0.75 & oe.nbr$OoverE.null < 1.31, 'Least disturbed', 
                                         ifelse(oe.nbr$OoverE.null >= 1.31, 'Enriched', -999)))))
+
   
-  .GlobalEnv$oe.nbr <- oe.nbr
+  model_outputs <- list(oe.mwcf = as.data.frame(oe.mwcf),
+                        oe.wccp = as.data.frame(oe.wccp),
+                        oe.nbr = as.data.frame(oe.nbr))
+  
+  return(model_outputs)
 }

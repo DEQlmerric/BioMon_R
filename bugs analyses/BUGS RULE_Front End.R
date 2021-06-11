@@ -7,8 +7,8 @@
 #     2) Query out the "missing summary" raw data, from AWQMS.  Link to Stations and Taxonomy tables.
 #     3) Calculate summary metrics
 #     4) Calculate PREDATOR O/E scores and supporting outputs
-      5) Calculate Stressor ID models
-              ........NO FUNCTION EXISTS.........
+#     5) Calculate Stressor ID models
+#             ........NO FUNCTION EXISTS.........
               # export "missing samples" as csv, 
               # import into C2 (third party software)
               # calculate both stressor models
@@ -18,19 +18,24 @@
               
 
               
-@@@  PLACEHOLDER: Lesleys "missing summary" query           
+# @@@  PLACEHOLDER: Lesleys "missing summary" query           
               
               
 # run data query from AWQMS
 source('bugs analyses/data/Data_from_AWQMS.R')
-data.raw.AWQMS()
+b_t_s <- data.raw.AWQMS()
               
               
 
 # run bug metrics function
 source('bugs analyses/metrics/bug metrics.R')
-bug.metrics(b_t_s)
+metrics <- bug.metrics(b_t_s)
 
 # run PREDATOR function
 source('bugs analyses/PREDATOR/PREDATOR models.R')
-bug.PREDATOR(b_t_s)
+model_outputs <- bug.PREDATOR(b_t_s)
+
+#unpack the model output list
+oe.mwcf <- model_outputs[["oe.mwcf"]]
+oe.wccp <- model_outputs[["oe.wccp"]]
+oe.nbr <- model_outputs[["oe.nbr"]]

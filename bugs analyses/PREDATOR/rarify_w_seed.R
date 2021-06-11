@@ -24,7 +24,7 @@ for(i in 1:nsamp) { ;
    #extract current sample;
    isamp<-sampid[i];
    flush.console();
-   print(as.character(isamp));
+   #print(as.character(isamp));
    onesamp<-inbug[inbug[,sample.ID]==isamp,];
    onesamp<-data.frame(onesamp,row.id=seq(1,dim(onesamp)[[1]])); #add sequence numbers as a new column;
    #expand the sample into a vector of individuals;

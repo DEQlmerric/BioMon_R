@@ -10,7 +10,7 @@
 
 # optimally, this would be turned into a function, to roll through all samples at once
 
-bug.metrics <- function(b_t_s){
+bug.metrics <- function(b_t_s = b_t_s){
 
 library(reshape)
 library(plyr)
@@ -324,6 +324,6 @@ for(i in 3:length(list.of.data.frames)){
 
 
 
-.GlobalEnv$metrics <- metrics
+return(metrics)
 }
 
